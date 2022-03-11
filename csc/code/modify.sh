@@ -1,1 +1,1 @@
-sed -i 's/char/int/g' fibo.c
+sed -i 's/$2/$3/g' $1
