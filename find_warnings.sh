@@ -4,12 +4,12 @@ grep "warning" warning.txt > result.txt
 sed -i 's/warning: //g' result.txt
 a=1
 b=0
-if [$? -eq $b]
+if [ $? -eq $b ]
 then
-while [$a -le $2]
+while [ $a -le $2 ]
 do
 $a | ./test >> result.txt
-a=$(expr $a+1)
+a=$[$a+1]
 done
 fi
-pwd
+pwd>>result.txt
