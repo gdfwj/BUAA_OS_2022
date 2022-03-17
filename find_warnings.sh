@@ -8,7 +8,7 @@ if [ $? -eq $b ]
 then
 while [ $a -le $2 ]
 do
-$a | ./test >> result.txt
+echo $a | ./test >> result.txt
 a=$[$a+1]
 done
 fi
