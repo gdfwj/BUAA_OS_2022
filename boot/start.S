@@ -27,6 +27,8 @@ LEAF(_start) /*LEAF is defined in asm.h and LEAF functions don't call other func
 	ori	t0, 0x2
 	mtc0	t0, CP0_CONFIG
 	
+	lui sp, 0x8040
+	jal main	
 	/*
       Exercise 1.4. Please complete this part.
       To do: 
