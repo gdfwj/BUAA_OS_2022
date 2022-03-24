@@ -72,11 +72,11 @@ int readelf(u_char *binary, int size)
 		int flag=0;
 		for(Nr = 0; Nr < sh_entry_count; Nr++){
 			shdr = (Elf32_Phdr*)(ptr_sh_table+Nr*sh_entry_size);
-			if((shdr->p_vaddr<lastend) && Nr!=0){
+			if((shdr->p_vaddr<lastend)){
 				printf("Conflict at page va : 0x%x\n", lastend & 0x1000);
 				return 0;
 			}
-			else if((shdr->p_vaddr<((lastend&0x100)+0x100)) && Nr!=0){
+			else if((shdr->p_vaddr<((lastend&0x100)+0x100))){
 				printf("Overlay at page va : 0x%x\n", lastend & 0x100);
 				return 0;
 			}
