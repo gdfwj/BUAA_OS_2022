@@ -85,6 +85,7 @@ int readelf(u_char *binary, int size)
 					}
 					else{
 						printf("Overlay at page va : 0x%x\n", start*0x1000);
+						return 0;
 					}
 				}
 			}
