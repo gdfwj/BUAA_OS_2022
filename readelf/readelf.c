@@ -68,35 +68,40 @@ int readelf(u_char *binary, int size)
 		sh_entry_size = ehdr->e_phentsize;
 		//shdr=(Elf32_Shdr*)ptr_sh_table;
         // for each section header, output section number and section addr.
-		Elf32_Half start[10], end[10];
+		int page[100000]={0};
 		for(Nr = 0; Nr < sh_entry_count; Nr++){
 			shdr = (Elf32_Phdr*)(ptr_sh_table+Nr*sh_entry_size);
-			start[Nr] = shdr->p_vaddr;
-			end[Nr] = shdr->p_memsz;
-		}
-		Elf32_Half temp;
-		int i,j;
-		for(i=0;i<Nr;i++){
-			for(j=0;j<Nr-i-2;j++){
-				if(start[j]>start[j+1]){
-					temp = start[j];
-					start[j] = start[j+1];
-					start[j+1] = temp;
-					temp = end[j];
-					end[j] = end[j+1];
-					end[j+1] = temp;
+			int start = shdr->p_vaddr/0x1000;
+			int end = (shdr->p_memsz+shdr->p_vaddr)/0x1000;
+			if(page[start]!=0){
+				if(page[start]==-1){
+					printf("Conflict at page va : 0x%x\n", start*0x1000);
+					return 0;
+				}
+				else{
+					if(page[start] > shdr->p_vaddr){
+						printf("Conflict at page va : 0x%x\n", start*0x1000);
+						return 0;
+					}
+					else{
+						printf("Overlay at page va : 0x%x\n", start*0x1000);
+					}
 				}
 			}
-		}
-		temp = end[0];
-		for(i=1;i<Nr;i++){
-			if(start[i]<temp){
-				printf("(Conflict at page va : 0x%x\n", temp & 0x1000);
-				return 0;
+			if(page[end]!=0){
+				if(page[end]>shdr->p_vaddr+shdr->p_memsz){
+					printf("Overlay at page va : 0x%x\n", end*0x1000);
+					return 0;
+				}
+				else{
+					printf("Conflict at page va : 0x%x\n", end*0x1000);
+return 0;
+				}
 			}
-			else if(start[i]<((temp&0x1000)+0x1000)){
-				printf("Overlay at page va : 0x%x\n", temp & 0x1000);
-				return 0;
+			page[start]=shdr->p_vaddr;
+			page[end]=shdr->p_vaddr+shdr->p_memsz;
+			for(int i=start+1;i<=end-1;i++){
+				page[i]=-1;
 			}
 		}
 			for (Nr = 0; Nr < sh_entry_count; Nr++) {
