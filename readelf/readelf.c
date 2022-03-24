@@ -74,24 +74,24 @@ int readelf(u_char *binary, int size)
 			int start = shdr->p_vaddr/0x1000;
 			int end = (shdr->p_memsz+shdr->p_vaddr)/0x1000;
 			if(page[start]!=0){
-				if(page[start]==-1){
-					printf("Conflict at page va : 0x%x\n", start*0x1000);
-					return 0;
-				}
-				else{
+				//if(page[start]==-1){
+				//	printf("Conflict at page va : 0x%x\n", start*0x1000);
+				//	return 0;
+				//}
+				//else{
 					if(page[start] > shdr->p_vaddr){
 						printf("Conflict at page va : 0x%x\n", start*0x1000);
 						return 0;
 					}
 					else{
-						//printf("Overlay at page va : 0x%x\n", start*0x1000);
+						printf("Overlay at page va : 0x%x\n", start*0x1000);
 						return 0;
 					}
-				}
+				//}
 			}
 			if(page[end]!=0){
 				if(page[end]>shdr->p_vaddr+shdr->p_memsz){
-					//printf("Overlay at page va : 0x%x\n", end*0x1000);
+					printf("Overlay at page va : 0x%x\n", end*0x1000);
 					return 0;
 				}
 				else{
@@ -101,9 +101,9 @@ int readelf(u_char *binary, int size)
 			}
 			page[start]=shdr->p_vaddr;
 			page[end]=shdr->p_vaddr+shdr->p_memsz;
-			for(int i=start+1;i<=end-1;i++){
-				page[i]=-1;
-			}
+			//for(int i=start+1;i<=end-1;i++){
+			//	page[i]=-1;
+			//}
 		}
 			for (Nr = 0; Nr < sh_entry_count; Nr++) {
 				shdr = (Elf32_Phdr*)(ptr_sh_table+Nr*sh_entry_size);
