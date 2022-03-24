@@ -89,16 +89,16 @@ int readelf(u_char *binary, int size)
 					}
 				//}
 			}
-			if(page[end]!=0){
-				if(page[end]>shdr->p_vaddr+shdr->p_memsz){
-					printf("Overlay at page va : 0x%x\n", end*0x1000);
-					return 0;
-				}
-				else{
-					printf("Conflict at page va : 0x%x\n", end*0x1000);
-					return 0;
-				}
-			}
+			//if(page[end]!=0){
+			//	if(page[end]>shdr->p_vaddr+shdr->p_memsz){
+			//		printf("Overlay at page va : 0x%x\n", end*0x1000);
+			//		return 0;
+			//	}
+			//	else{
+			//		printf("Conflict at page va : 0x%x\n", end*0x1000);
+			//		return 0;
+			//	}
+			//}
 			page[start]=shdr->p_vaddr;
 			page[end]=shdr->p_vaddr+shdr->p_memsz;
 			//for(int i=start+1;i<=end-1;i++){
