@@ -80,7 +80,7 @@ int readelf(u_char *binary, int size)
 				printf("Overlay at page va : 0x%x\n", lastend & 0x100);
 				return 0;
 			}
-			lastend = shdr-> p_memsz + shdr->p_vaddr;
+			lastend = shdr-> p_filesz + shdr->p_vaddr;
 		}
 			for (Nr = 0; Nr < sh_entry_count; Nr++) {
 				shdr = (Elf32_Phdr*)(ptr_sh_table+Nr*sh_entry_size);
