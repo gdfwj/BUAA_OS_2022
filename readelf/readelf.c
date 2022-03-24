@@ -49,7 +49,7 @@ int readelf(u_char *binary, int size)
 
         int Nr;
 
-        Elf32_Shdr *shdr = NULL;
+        Elf32_Phdr *shdr = NULL;
 
         u_char *ptr_sh_table = NULL;
         Elf32_Half sh_entry_count;
@@ -63,16 +63,30 @@ int readelf(u_char *binary, int size)
         }
 
         // get section table addr, section header number and section header size.
-		ptr_sh_table = binary+ehdr->e_shoff;
-		sh_entry_count = ehdr->e_shnum;
-		sh_entry_size = ehdr->e_shentsize;
+		ptr_sh_table = binary+ehdr->e_phoff;
+		sh_entry_count = ehdr->e_phnum;
+		sh_entry_size = ehdr->e_phentsize;
 		//shdr=(Elf32_Shdr*)ptr_sh_table;
         // for each section header, output section number and section addr.
-		for (Nr = 2; Nr < 4; Nr++) {
-			shdr = (Elf32_Shdr*)(ptr_sh_table+Nr*sh_entry_size);
-			printf("Read : %d:0x%x,0x%x\n", Nr, shdr->sh_offset, shdr->sh_addr);
+		int lastend=0;
+		int flag=0;
+		for(Nr = 0; Nr < sh_entry_count; Nr++){
+			shdr = (Elf32_Phdr*)(ptr_sh_table+Nr*sh_entry_size);
+			if((shdr->p_vaddr<lastend) && Nr!=0){
+				printf("Conflict at page va : 0x%x\n", lastend & 0x1000);
+				//return 0;
+			}
+			else if((shdr->p_vaddr<((lastend&0x100)+0x100)) && Nr!=0){
+				printf("Overlay at page va : 0x%x\n", lastend & 0x100);
+				//return 0;
+			}
+			lastend = shdr-> p_memsz + shdr->p_vaddr;
+		}
+			for (Nr = 0; Nr < sh_entry_count; Nr++) {
+				shdr = (Elf32_Phdr*)(ptr_sh_table+Nr*sh_entry_size);
+				printf("Read : %d:0x%x,0x%x\n", Nr, shdr->p_filesz, shdr-> p_memsz);
 			//shdr =(Elf32_Shdr*)((u_char*) shdr + sh_entry_size);
-		} 
+			} 
         // hint: section number starts at 0.
 
 
