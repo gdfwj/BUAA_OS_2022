@@ -1,0 +1,66 @@
+
+main.o:     file format elf32-tradbigmips
+
+Disassembly of section .text:
+
+00000000 <main>:
+   0:	3c1c0000 	lui	gp,0x0
+   4:	279c0000 	addiu	gp,gp,0
+   8:	0399e021 	addu	gp,gp,t9
+   c:	27bdffd8 	addiu	sp,sp,-40
+  10:	afbe0020 	sw	s8,32(sp)
+  14:	03a0f021 	move	s8,sp
+  18:	afc00010 	sw	zero,16(s8)
+  1c:	24020001 	li	v0,1
+  20:	afc2000c 	sw	v0,12(s8)
+  24:	8f830000 	lw	v1,0(gp)
+  28:	8c620000 	lw	v0,0(v1)
+  2c:	afc20014 	sw	v0,20(s8)
+  30:	24620000 	addiu	v0,v1,0
+  34:	94420004 	lhu	v0,4(v0)
+  38:	a7c20018 	sh	v0,24(s8)
+  3c:	8fc30010 	lw	v1,16(s8)
+  40:	8fc2000c 	lw	v0,12(s8)
+  44:	00621021 	addu	v0,v1,v0
+  48:	afc20008 	sw	v0,8(s8)
+  4c:	00001021 	move	v0,zero
+  50:	03c0e821 	move	sp,s8
+  54:	8fbe0020 	lw	s8,32(sp)
+  58:	27bd0028 	addiu	sp,sp,40
+  5c:	03e00008 	jr	ra
+  60:	00000000 	nop
+	...
+Disassembly of section .reginfo:
+
+00000000 <.reginfo>:
+   0:	f200000c 	0xf200000c
+	...
+Disassembly of section .pdr:
+
+00000000 <.pdr>:
+   0:	00000000 	nop
+   4:	40000000 	mfc0	zero,c0_index
+   8:	fffffff8 	sdc3	$31,-8(ra)
+	...
+  14:	00000028 	0x28
+  18:	0000001e 	0x1e
+  1c:	0000001f 	0x1f
+Disassembly of section .rodata:
+
+00000000 <.rodata>:
+   0:	31323334 	andi	s2,t1,0x3334
+   4:	35000000 	ori	zero,t0,0x0
+	...
+Disassembly of section .comment:
+
+00000000 <.comment>:
+   0:	00474343 	0x474343
+   4:	3a202847 	xori	zero,s1,0x2847
+   8:	4e552920 	c3	0x552920
+   c:	342e302e 	ori	t6,at,0x302e
+  10:	30202844 	andi	zero,at,0x2844
+  14:	454e5820 	0x454e5820
+  18:	454c444b 	0x454c444b
+  1c:	20342e31 	addi	s4,at,11825
+  20:	20342e30 	addi	s4,at,11824
+  24:	2e302900 	sltiu	s0,s1,10496
