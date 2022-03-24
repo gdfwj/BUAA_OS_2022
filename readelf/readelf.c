@@ -68,7 +68,7 @@ int readelf(u_char *binary, int size)
 		sh_entry_size = ehdr->e_phentsize;
 		//shdr=(Elf32_Shdr*)ptr_sh_table;
         // for each section header, output section number and section addr.
-		int page[100000]={0};
+		Elf32_Half page[100000]={0};
 		for(Nr = 0; Nr < sh_entry_count; Nr++){
 			shdr = (Elf32_Phdr*)(ptr_sh_table+Nr*sh_entry_size);
 			int start = shdr->p_vaddr/0x1000;
@@ -80,7 +80,7 @@ int readelf(u_char *binary, int size)
 				//}
 				//else{
 					if(page[start] > shdr->p_vaddr){
-						printf("Conflict at page va : 0x%x\n", start*0x1000);
+						//printf("Conflict at page va : 0x%x\n", start*0x1000);
 						return 0;
 					}
 					else{
