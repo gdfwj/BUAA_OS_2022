@@ -8,22 +8,24 @@
  * option) any later version.
  *
  */
-struct my_struct {
-int size;
-char c;
-int array[10];
-};
+//struct my_struct {
+//int size;
+//char c;
+//int array[10];
+//};
 
 #include <printf.h>
 #include <pmap.h>
 int main()
 {
-struct my_struct t1 = {10, 'Q', {0, -1, -2,4,4,4,4,7,8,9}};
+//struct my_struct t1 = {10, 'Q', {0, -1, -2,4,4,4,4,7,8,9}};
 //struct mystruct t2 = {2, 'Q', {1, 2}};
-printf("%T",&t1);
+//printf("%T",&t1);
 //printf("%T",&t2);
-printf("%04T",&t1);
+//printf("%04T",&t1);
 //printf("%-04T",$t2);
+	char a = _my_getchar();
+	_my_putchar(a);
 	printf("main.c:\tmain is start ...\n");
 	mips_init();
 	panic("main is over is error!");

@@ -3,7 +3,10 @@
 #include <asm/asm.h>
 LEAF(_my_getchar)
 	lui t0, 0xB000
-	lb t1, 0(t0)
+	loop1:
+		lb t1, 0(t0)
+		beq t1, zero, loop1
+		nop
 	sb t1, 0(t0)
 	jr ra
 END(_my_getchar)
