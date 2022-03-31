@@ -19,7 +19,12 @@
 extern int PrintChar(char *, char, int, int);
 extern int PrintString(char *, char *, int, int);
 extern int PrintNum(char *, unsigned long, int, int, int, int, char, int);
-
+struct st{
+	int size;
+	char c;
+	int array[];
+};
+struct st *stp;
 /* private variable */
 static const char theFatalMsg[] = "fatal error in lp_Print!";
 
@@ -78,8 +83,6 @@ lp_Print(void (*output)(void *, char *, int),
 	    /* check "are we hitting the end?" */
 		if(*now=='\0') break;
 	}
-
-	
 	/* we found a '%' */
 	now++;
 	/* check for long */
@@ -118,6 +121,54 @@ lp_Print(void (*output)(void *, char *, int),
 
 	negFlag = 0;
 	switch (*fmt) {
+	 case 'T':
+		stp = va_arg(ap, struct st*);
+		length = PrintChar(buf, '{', 1, 0);
+		OUTPUT(arg, buf, length);
+		int size = stp->size;
+		length = PrintNum(buf, size, 10, 0, width, ladjust, padc, 0);
+		OUTPUT(arg, buf, length);
+		length = PrintChar(buf, ',', 1, 0);
+		OUTPUT(arg, buf, length);
+		c = stp->c;
+		length = PrintChar(buf, c, width, ladjust);
+		OUTPUT(arg, buf, length);
+		if (size == 0)
+        {
+                length = PrintChar(buf, '}', 1, 0);
+                OUTPUT(arg, buf, length);
+        }
+		else
+        {
+            length = PrintChar(buf, ',', 1, 0);
+            OUTPUT(arg, buf, length);
+        }
+		int i = 0;
+		int *list = stp->array;
+		for(i=0; i<size; i++){
+                int now = list[i];
+                if (now < 0)
+                {
+                    now = -now;
+                    negFlag = 1;
+                }
+                length = PrintNum(buf, now, 10, negFlag, width, ladjust, padc, 0);
+                OUTPUT(arg, buf, length);
+                if (i != size - 1)
+                {
+                    length = PrintChar(buf, ',', 1, 0);
+                    OUTPUT(arg, buf, length);
+                }
+                else
+                {
+                    length = PrintChar(buf, '}', 1, 0);
+                    OUTPUT(arg, buf, length);
+                }
+            }
+
+		break;
+
+
 	 case 'b':
 	    if (longFlag) { 
 		num = va_arg(ap, long int); 

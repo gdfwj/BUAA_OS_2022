@@ -8,14 +8,23 @@
  * option) any later version.
  *
  */
+struct my_struct {
+int size;
+char c;
+int array[3];
+};
 
 #include <printf.h>
 #include <pmap.h>
-
 int main()
 {
+struct my_struct t1 = {3, 'b', {0, 1, 2}};
+//struct mystruct t2 = {2, 'Q', {1, 2}};
+printf("%T",&t1);
+//printf("%T",&t2);
+printf("%04T",&t1);
+//printf("%-04T",$t2);
 	printf("main.c:\tmain is start ...\n");
-
 	mips_init();
 	panic("main is over is error!");
 
