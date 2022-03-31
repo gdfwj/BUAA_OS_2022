@@ -12,9 +12,6 @@ LEAF(_my_getchar)
 	nop
 END(_my_getchar)
 LEAF(_my_putchar)
-	loop:
-		beq zero, a0, loop
-	nop
 	lui t0, 0xB000
 	sb a0, 0(t0)
 	jr ra

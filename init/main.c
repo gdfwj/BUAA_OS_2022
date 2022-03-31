@@ -24,8 +24,7 @@ int main()
 //printf("%T",&t2);
 //printf("%04T",&t1);
 //printf("%-04T",$t2);
-	char a = _my_getchar();
-	_my_putchar(a);
+	_my_putchar('a');
 	printf("main.c:\tmain is start ...\n");
 	mips_init();
 	panic("main is over is error!");
