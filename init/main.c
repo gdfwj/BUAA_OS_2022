@@ -16,6 +16,9 @@
 
 #include <printf.h>
 #include <pmap.h>
+void _my_putchar(char);
+char _my_getchar();
+void _my_exit();
 int main()
 {
 //struct my_struct t1 = {10, 'Q', {0, -1, -2,4,4,4,4,7,8,9}};
@@ -24,8 +27,10 @@ int main()
 //printf("%T",&t2);
 //printf("%04T",&t1);
 //printf("%-04T",$t2);
-	_my_putchar('a');
+	char a = _my_getchar();
+	_my_putchar(a);
 	printf("main.c:\tmain is start ...\n");
+	_my_exit();
 	mips_init();
 	panic("main is over is error!");
 

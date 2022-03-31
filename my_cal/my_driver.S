@@ -8,6 +8,7 @@ LEAF(_my_getchar)
 		beq t1, zero, loop1
 		nop
 	sb t1, 0(t0)
+	add a0, t1, zero
 	jr ra
 	nop
 END(_my_getchar)
