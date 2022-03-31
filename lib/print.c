@@ -137,6 +137,7 @@ lp_Print(void (*output)(void *, char *, int),
         {
                 length = PrintChar(buf, '}', 1, 0);
                 OUTPUT(arg, buf, length);
+				break;
         }
 		else
         {
