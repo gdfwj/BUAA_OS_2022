@@ -147,6 +147,7 @@ lp_Print(void (*output)(void *, char *, int),
 		int *list = stp->array;
 		for(i=0; i<size; i++){
                 int now = list[i];
+				negFlag=0;
                 if (now < 0)
                 {
                     now = -now;
