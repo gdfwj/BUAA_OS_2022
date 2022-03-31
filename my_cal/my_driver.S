@@ -9,6 +9,7 @@ LEAF(_my_getchar)
 		nop
 	sb t1, 0(t0)
 	jr ra
+	nop
 END(_my_getchar)
 LEAF(_my_putchar)
 	loop:
@@ -17,10 +18,12 @@ LEAF(_my_putchar)
 	lui t0, 0xB000
 	sb a0, 0(t0)
 	jr ra
+	nop
 END(_my_putchar)
 LEAF(_my_exit)
 	lui t0, 0xB000
 	addi t0, t0, 0x10
 	sb t0, 0(t0)
 	jr ra
+	nop
 END(_my_exit)
