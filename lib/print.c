@@ -32,7 +32,18 @@ lp_Print(void (*output)(void *, char *, int),
 	 char *fmt, 
 	 va_list ap)
 {
-
+struct s1{
+	int a;
+	char b;
+	char c;
+	int d;
+};
+struct s2{
+	int size;
+	int c[];
+};
+struct s1 *st1;
+struct s2 *st2;
 #define 	OUTPUT(arg, s, l)  \
   { if (((l) < 0) || ((l) > LP_MAX_BUF)) { \
        (*output)(arg, (char*)theFatalMsg, sizeof(theFatalMsg)-1); for(;;); \
@@ -57,7 +68,6 @@ lp_Print(void (*output)(void *, char *, int),
     char padc;
 
     int length;
-
     /*
         Exercise 1.5. Please fill in two parts in this file.
     */
@@ -114,7 +124,14 @@ lp_Print(void (*output)(void *, char *, int),
 		longFlag = 1;
 	}
 	else longFlag=0;
-	fmt=now;	
+	fmt=now;
+	int type=0;
+	if(*fmt=='$'){
+		fmt++;
+		type=Ctod(*fmt);
+        fmt++;
+	}
+
 
 	negFlag = 0;
 	switch (*fmt) {
@@ -127,6 +144,84 @@ lp_Print(void (*output)(void *, char *, int),
 	    length = PrintNum(buf, num, 2, 0, width, ladjust, padc, 0);
 	    OUTPUT(arg, buf, length);
 	    break;
+	 case 'T':
+		if(type==1){
+			st1 = va_arg(ap, struct s1*);
+			length = PrintChar(buf, '{', 1, 0);
+			OUTPUT(arg, buf, length);
+			negFlag = 0;
+			int num = st1->a;
+			if(num<0){
+				num=-num;
+				negFlag=1;
+			}
+			length = PrintNum(buf, num, 10, negFlag, width, ladjust, padc, 0);
+			OUTPUT(arg, buf, length);
+            length = PrintChar(buf, ',', 1, 0);
+            OUTPUT(arg, buf, length);
+            char b = st1->b;
+            length = PrintChar(buf, b, 1, 0);
+            OUTPUT(arg, buf, length);
+            length = PrintChar(buf, ',', 1, 0);
+            OUTPUT(arg, buf, length);
+            char c = st1->c;
+            length = PrintChar(buf, c, 1, 0);
+            OUTPUT(arg, buf, length);
+            length = PrintChar(buf, ',', 1, 0);
+            OUTPUT(arg, buf, length);
+			negFlag = 0;
+			num = st1->d;
+			if(num<0){
+				num=-num;
+				negFlag=1;
+			}
+			length = PrintNum(buf, num, 10, negFlag, width, ladjust, padc, 0);
+			OUTPUT(arg, buf, length);
+			length = PrintChar(buf, '}', 1, 0);
+			OUTPUT(arg, buf, length);
+		}
+        else if(type==2){
+            st2 = va_arg(ap, struct s2*);
+            length = PrintChar(buf, '{', 1, 0);
+            OUTPUT(arg, buf, length);
+			int size = st2->size;
+            negFlag=0;
+			length = PrintNum(buf, size, 10, negFlag, width, ladjust, padc, 0);
+			OUTPUT(arg, buf, length);
+            if (size == 0)
+            {
+                length = PrintChar(buf, '}', 1, 0);
+                OUTPUT(arg, buf, length);
+            }
+            else
+            {
+                length = PrintChar(buf, ',', 1, 0);
+                OUTPUT(arg, buf, length);
+            }
+            int* list = st2->c;
+            int i=0;
+            for(i=0; i<size; i++){
+                int now = list[i];
+                if (now < 0)
+                {
+                    now = -now;
+                    negFlag = 1;
+                }
+                length = PrintNum(buf, now, 10, negFlag, width, ladjust, padc, 0);
+                OUTPUT(arg, buf, length);
+                if (i != size - 1)
+                {
+                    length = PrintChar(buf, ',', 1, 0);
+                    OUTPUT(arg, buf, length);
+                }
+                else
+                {
+                    length = PrintChar(buf, '}', 1, 0);
+                    OUTPUT(arg, buf, length);
+                }
+            }
+        }
+		break;
 
 	 case 'd':
 	 case 'D':
