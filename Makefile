@@ -47,7 +47,7 @@ clean:
 run:
 	/OSLAB/gxemul -E testmips -C R3000 -M 64 ./gxemul/vmlinux
 
-add:
+sth:
 	git add --all
 	git commit -m "sth"
 
