@@ -179,13 +179,13 @@ void page_init(void)
 {
 	/* Step 1: Initialize page_free_list. */
 	/* Hint: Use macro `LIST_INIT` defined in include/queue.h. */
-	LIST_INIT($page_free_list);
+	LIST_INIT(&page_free_list);
 	/* Step 2: Align `freemem` up to multiple of BY2PG. */
 	ROUND(freemem, BY2PG);
 	/* Step 3: Mark all memory blow `freemem` as used(set `pp_ref`
 	 * filed to 1) */
-	struct page *now;
-	for(now = Pages; page2kva(now) < freemem; now++){
+	struct Page *now;
+	for(now = pages; page2kva(now) < freemem; now++){
 		now->pp_ref = 1;
 	}
 
@@ -194,7 +194,7 @@ void page_init(void)
 	for (; page2ppn(now) < npage; now++)
 	{
 		now->pp_ref = 0;
-		LIST_INSERT_TAIL($page_free_list, now, pp_link);
+		LIST_INSERT_TAIL(&page_free_list, now, pp_link);
 	}
 }
 
@@ -216,16 +216,16 @@ Use LIST_FIRST and LIST_REMOVE defined in include/queue.h .*/
 int page_alloc(struct Page **pp)
 {
 	struct Page *ppage_temp;
-	if (LIST_EMPTY($page_free_list/* I. `page_free_list` is empty */) return -E_NO_MEM;
+	if (LIST_EMPTY(&page_free_list)) return -E_NO_MEM;
 	// negative return value indicates exception.
 
-	ppage_tmp = LIST_FIRST($page_free_list)/* II. the first item in `page_free_list` */;
+	ppage_temp = LIST_FIRST(&page_free_list);
 
-  /* III. remove this page from the list */LIST_REMOVE(ppage_temp, pp_link);
+    LIST_REMOVE(ppage_temp, pp_link);
 
-  bzero(page2kva(ppage_temp)/* IV. kernel virtual address of this page */, BY2PG);
+    bzero(page2kva(ppage_temp), BY2PG);
 
-  *pp = ppage_tmp;
+  *pp = ppage_temp;
   return 0;
   // zero indicates success.
 	/* Step 1: Get a page from free memory. If fail, return the error code.*/

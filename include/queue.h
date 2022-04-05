@@ -112,10 +112,10 @@
 #define LIST_INSERT_AFTER(listelm, elm, field) do { \
 			LIST_NEXT((elm), field) = LIST_NEXT((listelm), field); \
 			if(LIST_NEXT((elm), field) != NULL){ \
-				LIST_NEXT((elm), field)->le_prev = &LIST_NEXT((elm), field); \
+				LIST_NEXT((elm), field)->field.le_prev = &LIST_NEXT((elm), field); \
 			} \
-			LIST_NEXT((listelm), field) = elm; \
-			(elm)->field.le_prev = $LIST_NEXT((listelm), field) \
+			LIST_NEXT((listelm), field) = (elm); \
+			(elm)->field.le_prev = &LIST_NEXT((listelm), field); \
 		} while(0)
         // Note: assign a to b <==> a = b
         //Step 1, assign elm.next to listelm.next.
@@ -154,17 +154,17 @@
  * Note: this function has big differences with LIST_INSERT_HEAD !
  */
 #define LIST_INSERT_TAIL(head, elm, field) do {  \
-	if((LIST_FIRST(head))!=NULL) {  \
+	if(LIST_FIRST((head))!=NULL) {  \
 		LIST_NEXT((elm), field) = LIST_FIRST((head)); \
 		while(LIST_NEXT(LIST_NEXT((elm), field), field) != NULL) { \
 			LIST_NEXT((elm), field) = LIST_NEXT(LIST_NEXT((elm), field), field); \
 		} \
 		LIST_NEXT(LIST_NEXT((elm), field), field) = elm; \
-		(elm)->field.le_prev = $LIST_NEXT(LIST_NEXT((elm), field), field); \
-		LIST_NEXT((elm), field) = NULL;\
+		(elm)->field.le_prev = &LIST_NEXT(LIST_NEXT((elm), field), field); \
+		LIST_NEXT((elm), field) = NULL; \
 	}  \
 	else { \
-		LIST_NEXT(elm) = NULL; \
+		LIST_NEXT((elm), field) = NULL; \
 		LIST_FIRST((head)) = (elm); \
 		(elm)->field.le_prev = &LIST_FIRST((head)); \
 	} \
