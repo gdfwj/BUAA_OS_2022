@@ -89,8 +89,8 @@ static void *alloc(u_int n, u_int align, int clear)
 static Pte *boot_pgdir_walk(Pde *pgdir, u_long va, int create)
 {
 
-	Pde *pgdir_entryp = pgdir + PDX(va);
-	Pte *pgtable, *pgtable_entry;
+	Pde *pgdir_entryp;
+	pgdir_entryp = pgdir + PDX(va);
 	/* Step 1: Get the corresponding page directory entry and page table. */
 	/* Hint: Use KADDR and PTE_AD：DR to get the page table from page directory
 	 * entry value. */
@@ -101,7 +101,7 @@ static Pte *boot_pgdir_walk(Pde *pgdir, u_long va, int create)
 	 * table. */
 	if ((*pgdir_entryp & PTE_V) == 0) {
         if (create) {
-			*pgdir_entryp = PADDR(alloc(BY2PG, BY2PG, 1)) | PTE_V | PTE_R;
+			*pgdir_entryp = (Pde)(PADDR(alloc(BY2PG, BY2PG, 1))) | PTE_V | PTE_R;
             /**
             * use `alloc` to allocate a page for the page table
             * set permission: `PTE_V | PTE_R`
@@ -112,7 +112,7 @@ static Pte *boot_pgdir_walk(Pde *pgdir, u_long va, int create)
 
 	/* Step 3: Get the page table entry for `va`, and return it. */
 	// return the address of entry of page table
-    return ((Pte *)(KADDR(PTE_ADDR(*pgdir_entryp))/* II. Kernel Virtual Address of PTBase */)) + PTX(va);
+    return (Pte *)(KADDR(PTE_ADDR(*pgdir_entryp))) + PTX(va);
 
 }
 
@@ -126,19 +126,14 @@ static Pte *boot_pgdir_walk(Pde *pgdir, u_long va, int create)
   Size is a multiple of BY2PG.*/
 void boot_map_segment(Pde *pgdir, u_long va, u_long size, u_long pa, int perm)
 {
-	int i, va_temp;
+	int i;
 	Pte *pgtable_entry;
 	size = ROUND(size, BY2PG);
-    for (i = 0, size = ROUND(size, BY2PG); i < size; i += BY2PG) {
+    for (i = 0; i < size; i += BY2PG) {
         /* Step 1. use `boot_pgdir_walk` to "walk" the page directory */
-        pgtable_entry = boot_pgdir_walk(
-            pgdir,
-            va + i,
-            1 
-        );
+        pgtable_entry = boot_pgdir_walk(pgdir, va + i, 1);
         /* Step 2. fill in the page table */
-        *pgtable_entry = (PTE_ADDR(pa))
-                        | perm | PTE_V;
+        *pgtable_entry = (PTE_ADDR(pa)) | perm | PTE_V;
     }
 	/* Step 1: Check if `size` is a multiple of BY2PG. */
 	
@@ -211,10 +206,15 @@ void page_init(void)
 
 	/* Step 4: Mark the other memory as free. */
 
-	for (; page2ppn(now) < npage; now++)
+	//for (; page2ppn(now) < npage; now++)
+	//{
+	//	now->pp_ref = 0;
+	//	LIST_INSERT_TAIL(&page_free_list, now, pp_link);
+	//}
+	for (now = &pages[PPN(PADDR(freemem))]; page2ppn(now) < npage; now++)
 	{
 		now->pp_ref = 0;
-		LIST_INSERT_TAIL(&page_free_list, now, pp_link);
+		LIST_INSERT_HEAD(&page_free_list, now, pp_link);
 	}
 }
 
@@ -301,19 +301,23 @@ int pgdir_walk(Pde *pgdir, u_long va, int create, Pte **ppte)
 	Pde *pgdir_entry = pgdir + PDX(va);
 	struct Page *page;
 	int ret;
+	Pte *pgtable;
     
     // check whether the page table exists
     if ((*pgdir_entry & PTE_V) == 0) {
         if (create) {
             if ((ret = page_alloc(&page)) < 0) return ret;
-            *pgdir_entry = (page2pa(page)/* Physical Address of `page` */)
-                          | PTE_V | PTE_R;
+            *pgdir_entry = page2pa(page);
+			*pgdir_entry = *pgdir_entry | PTE_V | PTE_R;
+			page->pp_ref++;
         } else {
             *ppte = 0;
             return 0;
         }
     }
-    *ppte = ((Pte *)(KADDR(PTE_ADDR(*pgdir_entry))/*Kernel Virtual Address of PTBase */)) + PTX(va);
+	pgtable = (Pte *) KADDR(PTE_ADDR(*pgdir_entry));
+	*ppte = pgtable + PTX(va);
+    //*ppte = ((Pte *)(KADDR(PTE_ADDR(*pgdir_entry))/*Kernel Virtual Address of PTBase */)) + PTX(va);
     return 0;
 	/* Step 1: Get the corresponding page directory entry and page table. */
 
@@ -360,10 +364,10 @@ int page_insert(Pde *pgdir, struct Page *pp, u_long va, u_int perm)
 	}
 	tlb_invalidate(pgdir, va);                      // <~~
     /* Step 1. use `pgdir_walk` to "walk" the page directory */
-    if ((ret = pgdir_walk(pgdir, va, 1, &pgtable_entry)) < 0)
+    if ((ret = pgdir_walk(pgdir, va, 1, &pgtable_entry)) != 0)
         return ret; // exception
     /* Step 2. fill in the page table */
-    *pgtable_entry = (page2pa(pp)) | perm;
+    *pgtable_entry = (page2pa(pp)) | PERM;
     pp->pp_ref++;
     return 0;
 
