@@ -98,11 +98,13 @@ int page_insert(Pde *pgdir, struct Page *pp, u_long va, u_int perm);
 struct Page *page_lookup(Pde *pgdir, u_long va, Pte **ppte);
 void page_remove(Pde *pgdir, u_long va) ;
 void tlb_invalidate(Pde *pgdir, u_long va);
-
+static void *alloc(u_int, u_int, int);
 void boot_map_segment(Pde *pgdir, u_long va, u_long size, u_long pa, int perm);
 int page_protect(struct Page *pp);
 int page_status_query(struct Page *pp);
 extern struct Page *pages;
-
+void buddy_init(void);
+int buddy_alloc(u_int size, u_int *pa, u_char *pi);
+void buddy_free(u_int pa);
 
 #endif /* _PMAP_H_ */

@@ -14,9 +14,161 @@ Pde *boot_pgdir;
 
 struct Page *pages;
 static u_long freemem;
-
 static struct Page_list page_free_list;	/* Free list of physical pages */
+struct Buddy{
+	struct Buddy *next;
+	u_long start;
+	u_long size;
+	u_char init_num;
+	u_int level;
+	u_char use;
+}*head=NULL;
 
+void buddy_init(void){
+	u_int start = 0x2000000;
+	struct Buddy *temp;
+	struct Buddy *last;
+	u_long size = 0x400000;
+	u_int i;
+	for(i=1;i<=4;i++) {
+		temp = (struct Buddy*)alloc(sizeof(struct Buddy), sizeof(struct Buddy), 1);
+		temp->start = start+(u_int)size*(i-1);
+		temp->size = size;
+		temp->init_num = i;
+		temp->use=0;
+		temp->level = 0;
+		if(head==NULL){			
+			head = temp;
+		}
+		else{
+			last->next=temp;
+		}
+		last=temp;
+	}
+}
+
+int buddy_alloc(u_int size, u_int *pa, u_char *pi){
+	struct Buddy *temp, *last, *temp1, *temp2;
+	temp=head;
+	for(temp=head;temp!=NULL;temp=temp->next){
+		if(temp->size>=size&&temp->use==0){
+			break;
+		}
+		last=temp;
+	}
+	if(temp==NULL){
+		return -1;
+	}
+	while(1){	
+		if(temp->size==0x1000||temp->size/2<size){
+			temp->use=1;
+			break;
+		}
+		temp1 = (struct Buddy*)alloc(sizeof(struct Buddy), sizeof(struct Buddy), 1);
+		temp2 = (struct Buddy*)alloc(sizeof(struct Buddy), sizeof(struct Buddy), 1);
+		temp1->start = temp->start;
+		temp2->start = temp->start+temp->size/2;
+		temp1->size = temp2->size = temp->size/2;
+		temp1->init_num = temp2->init_num = temp->init_num;
+		temp1->level = temp2->level = temp->level+1;
+		temp1->use=temp2->use=0;
+		if(temp==head){
+			head=temp1;
+		}
+		else last->next = temp1;
+		temp1->next=temp2;
+		temp2->next = temp->next;
+		//free(temp);
+		temp = temp1;
+	}
+	temp->use=1;
+	pa = temp->start;
+	u_char i=0;
+	u_long t = temp->size>>12;
+	for(;t!=1;t=t/2){
+		i++;
+	}
+	*pi = i;
+	return 0;
+}
+void buddy_free(u_int pa){
+	struct Buddy *temp, *last, *temp1, *temp2, *last2;
+	for(temp=head;;temp=temp->next){
+		if(temp->start==pa){
+			break;
+		}
+		last2=last;
+		last=temp;
+	}
+	temp->use=0;
+	while(1){
+		if(temp->level==0) break;
+		if(temp==head){
+			if(temp->next->init_num==temp->init_num && temp->next->use==0 && temp->level == temp->next->level){
+				temp1 = (struct Buddy*)alloc(sizeof(struct Buddy), sizeof(struct Buddy), 1);
+				temp1->size = temp->size*2;
+				temp1->start = temp->start;
+				temp1->use=0;
+				temp1->level = temp->level-1;
+				temp1->init_num = temp->init_num;
+				head = temp1;
+				temp1->next = temp->next->next;
+				//free(temp->next);
+				//free(temp);
+				temp = temp1;
+			}
+			else break;
+		}
+		else if(temp->next!=NULL){
+			if(temp->next->init_num==temp->init_num && temp->next->use==0 && temp->level == temp->next->level){
+                 temp1 = (struct Buddy*)alloc(sizeof(struct Buddy), sizeof(struct Buddy), 1);
+                 temp1->size = temp->size*2;
+                 temp1->start = temp->start;
+                 temp1->use=0;
+                 temp1->level = temp->level-1;
+                 temp1->init_num = temp->init_num;
+				 if(temp==head) head=temp1;
+                 else last->next = temp1;
+                 temp1->next = temp->next->next;
+                 //free(temp->next);
+                 //free(temp);
+                 temp = temp1;
+			}
+			else if(last->init_num==temp->init_num && last->use==0 && last->level == temp->level){
+				temp1 = (struct Buddy*)alloc(sizeof(struct Buddy), sizeof(struct Buddy), 1);
+				temp1->size = temp->size*2;
+				temp1->start = last->start;
+				temp1->use=0;
+				temp1->level = temp->level-1;
+				temp1->init_num = temp->init_num;
+				if(last==head) head = temp1;
+				else last2->next = temp1;
+				temp1->next = temp->next;
+				//free(temp);
+				//free(last);
+				temp = temp1;
+			}
+			else break;
+		}
+		else {
+			if(last->init_num==temp->init_num && last->use==0 && last->level == temp->level){
+				temp1 = (struct Buddy*)alloc(sizeof(struct Buddy), sizeof(struct Buddy), 1);
+                temp1->size = temp->size*2;
+                temp1->start = last->start;
+                temp1->use=0;
+                temp1->level = temp->level-1;
+                temp1->init_num = temp->init_num;
+                if(last==head) head = temp1;
+                else last2->next = temp1;
+                temp1->next = temp->next;
+                //free(temp);
+                //free(last);
+                temp = temp1;
+			}
+			else break;
+		}
+	}
+}
 
 /* Exercise 2.1 */
 /* Overview:
