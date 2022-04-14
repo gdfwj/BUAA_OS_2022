@@ -223,12 +223,12 @@ int page_protect(struct Page *pp){
 	int in=0;
 	struct Page *temp;
 	if(pp->pp_ref>0) return -1;
-	LIST_FOREACH(temp, &page_free_list, pp_link){
-		if(temp==pp){
-			in=1;
-		}
-	}
-	if(in==1) return -1;
+	//LIST_FOREACH(temp, &page_free_list, pp_link){
+	//	if(temp==pp){
+	//		in=1;
+	//	}
+	//}
+	//if(in==1) return -1;
 	pp->protect=1;
 	return 0;
 }
@@ -266,8 +266,13 @@ int page_alloc(struct Page **pp)
 	if (LIST_EMPTY(&page_free_list)) return -E_NO_MEM;
 	// negative return value indicates exception.
 
-	ppage_temp = LIST_FIRST(&page_free_list);
-
+	//ppage_temp = LIST_FIRST(&page_free_list);
+	LIST_FOREACH(ppage_temp, &page_free_list, pp_link){
+		if(ppage_temp->protect==0){
+			break;
+		}
+	}
+	
     LIST_REMOVE(ppage_temp, pp_link);
 
     bzero(page2kva(ppage_temp), BY2PG);
