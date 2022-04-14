@@ -30,7 +30,7 @@ void buddy_init(void){
 	struct Buddy *last;
 	u_long size = 0x400000;
 	u_int i;
-	for(i=1;i<=4;i++) {
+	for(i=1;i<=8;i++) {
 		temp = (struct Buddy*)alloc(sizeof(struct Buddy), sizeof(struct Buddy), 1);
 		temp->start = start+(u_int)size*(i-1);
 		temp->size = size;
