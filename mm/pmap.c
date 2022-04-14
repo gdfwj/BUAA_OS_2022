@@ -20,7 +20,7 @@ struct Buddy{
 	u_long start;
 	u_long size;
 	u_char init_num;
-	u_int level;
+	u_char level;
 	u_char use;
 }*head=NULL;
 
@@ -31,8 +31,7 @@ void buddy_init(void){
 	u_long size = 0x400000;
 	u_int i;
 	for(i=1;i<=4;i++) {
-		struct Buddy ab;
-		temp = &ab;
+		temp = (struct Buddy*)alloc(sizeof(struct Buddy), sizeof(struct Buddy), 1);
 		temp->start = start+(u_int)size*(i-1);
 		temp->size = size;
 		temp->init_num = i;
@@ -65,9 +64,8 @@ int buddy_alloc(u_int size, u_int *pa, u_char *pi){
 			temp->use=1;
 			break;
 		}
-		struct Buddy ab, bb;
-		temp1 = &ab;
-		temp2 = &bb;
+		temp1 = (struct Buddy*)alloc(sizeof(struct Buddy), sizeof(struct Buddy), 1);
+		temp2 = (struct Buddy*)alloc(sizeof(struct Buddy), sizeof(struct Buddy), 1);
 		temp1->start = temp->start;
 		temp2->start = temp->start+temp->size/2;
 		temp1->size = temp2->size = temp->size/2;
@@ -107,8 +105,7 @@ void buddy_free(u_int pa){
 		if(temp->level==0) break;
 		if(temp==head){
 			if(temp->next->init_num==temp->init_num && temp->next->use==0 && temp->level == temp->next->level){
-				struct Buddy ab;
-				temp1 = &ab;
+				temp1 = (struct Buddy*)alloc(sizeof(struct Buddy), sizeof(struct Buddy), 1);
 				temp1->size = temp->size*2;
 				temp1->start = temp->start;
 				temp1->use=0;
@@ -124,8 +121,7 @@ void buddy_free(u_int pa){
 		}
 		else if(temp->next!=NULL){
 			if(temp->next->init_num==temp->init_num && temp->next->use==0 && temp->level == temp->next->level){
-				struct Buddy ab;
-                 temp1 = &ab;
+                 temp1 = (struct Buddy*)alloc(sizeof(struct Buddy), sizeof(struct Buddy), 1);
                  temp1->size = temp->size*2;
                  temp1->start = temp->start;
                  temp1->use=0;
@@ -139,8 +135,7 @@ void buddy_free(u_int pa){
                  temp = temp1;
 			}
 			else if(last->init_num==temp->init_num && last->use==0 && last->level == temp->level){
-				struct Buddy ab;
-				temp1 = &ab;
+				temp1 = (struct Buddy*)alloc(sizeof(struct Buddy), sizeof(struct Buddy), 1);
 				temp1->size = temp->size*2;
 				temp1->start = last->start;
 				temp1->use=0;
@@ -157,8 +152,7 @@ void buddy_free(u_int pa){
 		}
 		else {
 			if(last->init_num==temp->init_num && last->use==0 && last->level == temp->level){
-				struct Buddy ab;
-				temp1 = &ab;
+				temp1 = (struct Buddy*)alloc(sizeof(struct Buddy), sizeof(struct Buddy), 1);
                 temp1->size = temp->size*2;
                 temp1->start = last->start;
                 temp1->use=0;
