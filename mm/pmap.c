@@ -4,7 +4,6 @@
 #include "env.h"
 #include "error.h"
 
-
 /* These variables are set by mips_detect_memory() */
 u_long maxpa;            /* Maximum physical address */
 u_long npage;            /* Amount of memory(in pages) */
@@ -202,6 +201,7 @@ void page_init(void)
 	struct Page *now;
 	for(now = pages; page2kva(now) < freemem; now++){
 		now->pp_ref = 1;
+		now->protect = 0;
 	}
 
 	/* Step 4: Mark the other memory as free. */
@@ -214,10 +214,35 @@ void page_init(void)
 	for (now = &pages[PPN(PADDR(freemem))]; page2ppn(now) < npage; now++)
 	{
 		now->pp_ref = 0;
+		now->protect = 0;
 		LIST_INSERT_HEAD(&page_free_list, now, pp_link);
 	}
 }
-
+int page_protect(struct Page *pp){
+	if(pp->protect==1) return -2;
+	int in=0;
+	struct Page *temp;
+	LIST_FOREACH(temp, &page_free_list, pp_link){
+		if(temp==pp){
+			in=1;
+		}
+	}
+	if(in==1) return -1;
+	pp->protect=1;
+	return 0;
+}
+int page_status_query(struct Page *pp){
+	if(pp->protect==1) return 3;
+	int in=0;
+	struct Page *temp;
+    LIST_FOREACH(temp, &page_free_list, pp_link){
+        if(temp==pp){
+            in=1;
+        }
+	}
+	if(in==1) return 1;
+	return 2;
+}
 /* Exercise 2.4 */
 /*Overview:
   Allocates a physical page from free memory, and clear this page.
