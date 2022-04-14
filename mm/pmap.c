@@ -223,12 +223,12 @@ int page_protect(struct Page *pp){
 	int in=0;
 	struct Page *temp;
 	if(pp->pp_ref>0) return -1;
-	//LIST_FOREACH(temp, &page_free_list, pp_link){
-	//	if(temp==pp){
-	//		in=1;
-	//	}
-	//}
-	//if(in==1) return -1;
+	LIST_FOREACH(temp, &page_free_list, pp_link){
+		if(temp==pp){
+			in=1;
+		}
+	}
+	if(in==1) return -1;
 	pp->protect=1;
 	return 0;
 }
