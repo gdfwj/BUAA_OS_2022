@@ -15,6 +15,8 @@ buddy_free(pa_2);
 }
 void mips_init(){
 mips_detect_memory();
+mips_vm_init();
+page_init();
 buddy_init();
 buddy_test();
 *((volatile char*)(0xB0000010)) = 0;

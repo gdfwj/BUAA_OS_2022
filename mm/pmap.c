@@ -82,7 +82,7 @@ int buddy_alloc(u_int size, u_int *pa, u_char *pi){
 		temp = temp1;
 	}
 	temp->use=1;
-	pa = temp->start;
+	*pa = temp->start;
 	u_char i=0;
 	u_long t = temp->size>>12;
 	for(;t!=1;t=t/2){
