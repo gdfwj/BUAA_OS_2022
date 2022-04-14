@@ -37,6 +37,7 @@ void buddy_init(void){
 		temp->init_num = i;
 		temp->use=0;
 		temp->level = 0;
+		temp->next=NULL;
 		if(head==NULL){			
 			head = temp;
 		}
