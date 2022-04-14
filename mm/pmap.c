@@ -222,6 +222,7 @@ int page_protect(struct Page *pp){
 	if(pp->protect==1) return -2;
 	int in=0;
 	struct Page *temp;
+	if(pp->pp_ref>0) return -1;
 	LIST_FOREACH(temp, &page_free_list, pp_link){
 		if(temp==pp){
 			in=1;
@@ -235,6 +236,7 @@ int page_status_query(struct Page *pp){
 	if(pp->protect==1) return 3;
 	int in=0;
 	struct Page *temp;
+	if(pp->pp_ref>0) return 1;
     LIST_FOREACH(temp, &page_free_list, pp_link){
         if(temp==pp){
             in=1;
