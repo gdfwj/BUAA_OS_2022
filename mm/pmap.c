@@ -133,7 +133,7 @@ void boot_map_segment(Pde *pgdir, u_long va, u_long size, u_long pa, int perm)
         /* Step 1. use `boot_pgdir_walk` to "walk" the page directory */
         pgtable_entry = boot_pgdir_walk(pgdir, va + i, 1);
         /* Step 2. fill in the page table */
-        *pgtable_entry = (PTE_ADDR(pa)) | perm | PTE_V;
+        *pgtable_entry = (PTE_ADDR(pa+i)) | perm | PTE_V;
     }
 	/* Step 1: Check if `size` is a multiple of BY2PG. */
 	
@@ -143,7 +143,21 @@ void boot_map_segment(Pde *pgdir, u_long va, u_long size, u_long pa, int perm)
 
 
 }
-
+int inverted_page_lookup(Pde *pgdir, struct Page *pp, int vpn_buffer[]){
+	u_long va=0;
+	u_long temp;
+	int count=0;
+	Pte *pgtable_entry;
+	for(va=0;va<=4<<22;va+=1<<12){
+		temp=pgdir+PDX(va);
+		pgdir_walk(pgdir, va, 0 /* for check */, &pgtable_entry);
+		if(pgtable_entry==0){
+			vpn_buffer[count]=temp>>12;
+			count++;
+		}
+	}
+	return count;
+}
 /* Overview:
    Set up two-level page table.
 
