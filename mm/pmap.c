@@ -144,7 +144,7 @@ void boot_map_segment(Pde *pgdir, u_long va, u_long size, u_long pa, int perm)
 
 }
 int inverted_page_lookup(Pde *pgdir, struct Page *pp, int vpn_buffer[]){
-	u_long va;
+	u_long va=0;
 	int count=0;
 	struct Page *temppage;
 	Pte *pgtable_entry;
