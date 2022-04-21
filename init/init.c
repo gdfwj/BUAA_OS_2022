@@ -29,7 +29,7 @@ mips_detect_memory();
 mips_vm_init();
 page_init();
 inverted_page_lookup_test();
-panic("endendendend");
+*((volatile char*)(0xB0000010)) = 0;
 }
 
 void bcopy(const void *src, void *dst, size_t len)
