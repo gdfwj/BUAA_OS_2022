@@ -148,7 +148,7 @@ int inverted_page_lookup(Pde *pgdir, struct Page *pp, int vpn_buffer[]){
 	int count=0;
 	struct Page *temppage;
 	Pte *pgtable_entry;
-	for(va=0;va<=0x9fffffff;va+=0x1000){
+	for(va=0;va<=0xbfffffff;va+=0x1000){
 		temppage = page_lookup(pgdir, va, &pgtable_entry);
 		if(temppage==pp){
 			vpn_buffer[count]=PPN(va);
