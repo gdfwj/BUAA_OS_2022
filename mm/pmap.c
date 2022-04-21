@@ -153,6 +153,7 @@ int inverted_page_lookup(Pde *pgdir, struct Page *pp, int vpn_buffer[]){
 		if(temppage==pp){
 			vpn_buffer[count]=PPN(va);
 			count++;
+			temppage=NULL;
 		}
 	}
 	return count;
