@@ -155,7 +155,7 @@ int inverted_page_lookup(Pde *pgdir, struct Page *pp, int vpn_buffer[]){
 		//	continue;    //the page is not in memory.
 		//}
 		temppage = page_lookup(pgdir, va, &pgtable_entry);
-		if(/*pa2page(*pte)==pp*/temppage==pp){
+		if(temppage==pp){
 			vpn_buffer[count]=PPN(va);
 			count++;
 		}
