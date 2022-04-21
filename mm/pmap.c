@@ -149,7 +149,7 @@ int inverted_page_lookup(Pde *pgdir, struct Page *pp, int vpn_buffer[]){
 	struct Page *temppage;
 	Pte *pgtable_entry;
 	//Pte *pte
-	for(va=0;va<=0xaffff000;va+=0x1000){
+	for(va=0;va<=0xcffff000;va+=0x1000){
 		//pgdir_walk(pgdir, va, 0, &pte);
 		//if (pte == 0) {
 		//	continue;
