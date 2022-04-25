@@ -148,7 +148,7 @@ env_init(void)
 	}
 	LIST_INIT(&env_sched_list[0]);
 	LIST_INIT(&env_sched_list[1]);
-
+	//printf("env_init_success");
 }
 
 
@@ -171,7 +171,7 @@ env_setup_vm(struct Env *e)
      *   using a function you completed in the lab2 and add its pp_ref.
      *   pgdir is the page directory of Env e, assign value for it. */
 	r = page_alloc(&p);
-    if (r==-E_NO_MEM) {
+    if (r!=0) {
         panic("env_setup_vm - page alloc error\n");
         return r;
     }
@@ -198,10 +198,12 @@ env_setup_vm(struct Env *e)
      *  See ./include/mmu.h for layout.
      *  Can you use boot_pgdir as a template?
      */
-
+	e->env_pgdir = pgdir;
+	e->env_cr3 = PADDR(pgdir);
 
     /* UVPT maps the env's own page table, with read-only permission.*/
-    e->env_pgdir[PDX(UVPT)]  = e->env_cr3 | PTE_V;
+    e->env_pgdir[PDX(VPT)]   = e->env_cr3;
+    e->env_pgdir[PDX(UVPT)]  = e->env_cr3 | PTE_V |PTE_R;
     return 0;
 }
 
@@ -232,12 +234,17 @@ env_alloc(struct Env **new, u_int parent_id)
     struct Env *e;
 
     /* Step 1: Get a new Env from env_free_list*/
+	if (LIST_EMPTY(&env_free_list))
+	{
+		*new = NULL;
+		return -E_NO_FREE_ENV;
+	}
 	e = LIST_FIRST(&env_free_list);
-	
-
+	//printf("call_env_setup_vm\n");
     /* Step 2: Call a certain function (has been completed just now) to init kernel memory layout for this new Env.
      *The function mainly maps the kernel address to this new Env address. */
 	env_setup_vm(e);
+	//printf("env_setup_vm_success\n");
 
     /* Step 3: Initialize every field of new Env with appropriate values.*/
 	e->env_id = mkenvid(e);
@@ -620,8 +627,9 @@ void load_icode_check() {
     u_int paddr;
     assert(envid2env(1024, &e, 0) == 0);
     /* text & data: 0x00401030 - 0x00409adc left closed and right open interval */
-    assert(pgdir_walk(e->env_pgdir, 0x00401000, 0, &pte) == 0);
-    assert(*((int *)KADDR(PTE_ADDR(*pte)) + 0xc) == 0x8fa40000);
+	assert(pgdir_walk(e->env_pgdir, 0x00401000, 0, &pte) == 0);
+    //printf("%x\n", *((int *)KADDR(PTE_ADDR(*pte)) + 0xc));
+	assert(*((int *)KADDR(PTE_ADDR(*pte)) + 0xc) == 0x8fa40000);
     assert(*((int *)KADDR(PTE_ADDR(*pte)) + 1023) == 0x26300001);
     assert(pgdir_walk(e->env_pgdir, 0x00402000, 0, &pte) == 0);
     assert(*((int *)KADDR(PTE_ADDR(*pte))) == 0x10800004);
