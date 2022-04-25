@@ -14,6 +14,8 @@ void mips_init()
 	page_init();
 
 	env_init();
+	ENV_CREATE_PRIORITY(user_A, 2);
+	ENV_CREATE_PRIORITY(user_B, 1);
 	env_check();
 	load_icode_check();
 
@@ -25,8 +27,8 @@ void mips_init()
 
 
 
-	trap_init();
-	kclock_init();
+	//trap_init();
+	//kclock_init();
 	panic("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
 	while(1);
 	panic("init.c:\tend of mips_init() reached!");

@@ -71,13 +71,13 @@ int load_elf(u_char *binary, int size, u_long *entry_point, void *user_data,
                 phdr = (Elf32_Phdr *)ptr_ph_table;
 
                 if (phdr->p_type == PT_LOAD) {
+					r = map(phdr->p_vaddr, phdr->p_memsz, binary+phdr->p_offset, phdr->p_filesz, user_data);
 	/* Your task here!  */
         /* Real map all section at correct virtual address.Return < 0 if error. */
         /* Hint: Call the callback function you have achieved before. */
-	
-
-
-
+					if(r<0){
+						return r;
+					}
                 }
 
                 ptr_ph_table += ph_entry_size;
