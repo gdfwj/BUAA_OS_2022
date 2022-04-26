@@ -177,6 +177,8 @@ env_setup_vm(struct Env *e)
     }
 	p->pp_ref++;
 	pgdir = (Pde*)page2kva(p);
+	e->env_pgdir = pgdir;
+	e->env_cr3 = PADDR(pgdir);
 
     /* Step 2: Zero pgdir's field before UTOP. */
 	for(i=0;i<PDX(UTOP);i++){
@@ -186,10 +188,7 @@ env_setup_vm(struct Env *e)
     /* Step 3: Copy kernel's boot_pgdir to pgdir. */
 	for (i = PDX(UTOP); i < PTE2PT; i++)
 	{
-		if (i!=PDX(VPT)&&i!=PDX(UVPT))
-		{
-			pgdir[i] = boot_pgdir[i];
-		}
+		pgdir[i] = boot_pgdir[i];
 	}
 
     /* Hint:
@@ -198,12 +197,10 @@ env_setup_vm(struct Env *e)
      *  See ./include/mmu.h for layout.
      *  Can you use boot_pgdir as a template?
      */
-	e->env_pgdir = pgdir;
-	e->env_cr3 = PADDR(pgdir);
 
     /* UVPT maps the env's own page table, with read-only permission.*/
     e->env_pgdir[PDX(VPT)]   = e->env_cr3;
-    e->env_pgdir[PDX(UVPT)]  = e->env_cr3 | PTE_V |PTE_R;
+    e->env_pgdir[PDX(UVPT)]  = e->env_cr3 |PTE_R;
     return 0;
 }
 
