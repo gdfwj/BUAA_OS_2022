@@ -12,7 +12,6 @@
 #include <asm/regdef.h>
 #include <asm/cp0regdef.h>
 #include <asm/asm.h>
-.section .text.exc_vec3
 /*** exercise 3.12 ***/
 .section .text.exc_vec3
 NESTED(except_vec3, 0, sp)
