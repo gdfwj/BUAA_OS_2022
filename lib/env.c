@@ -21,16 +21,12 @@ extern char *KERNEL_SP;
 static u_int asid_bitmap[2] = {0}; // 64
 
 
-/* Overview:
- *  This function is to allocate an unused ASID
- *
- * Pre-Condition:
- *  the number of running processes should be less than 64
- *
- * Post-Condition:
- *  return the allocated ASID on success
- *  panic when too many processes are running
- */
+int S[3];
+struct Env* waitlist1[10000];
+struct Env* waitlist2[10000];
+int head1=0,tail1=0;
+int head2=0,tail2=0;
+int envn=0;
 static u_int asid_alloc() {
     int i, index, inner;
     for (i = 0; i < 64; ++i) {
@@ -43,6 +39,21 @@ static u_int asid_alloc() {
     }
     panic("too many processes!");
 }
+u_int mkenvid(struct Env *e) {
+    u_int idx = e - envs;
+    u_int asid = asid_alloc();
+    return (asid << (1 + LOG2NENV)) | (1 << LOG2NENV) | idx;
+}
+/* Overview:
+ *  This function is to allocate an unused ASID
+ *
+ * Pre-Condition:
+ *  the number of running processes should be less than 64
+ *
+ * Post-Condition:
+ *  return the allocated ASID on success
+ *  panic when too many processes are running
+ */
 
 /* Overview:
  *  When a process is killed, free its ASID
@@ -66,11 +77,6 @@ static void asid_free(u_int i) {
  * Post-Condition:
  *  return e's envid on success
  */
-u_int mkenvid(struct Env *e) {
-    u_int idx = e - envs;
-    u_int asid = asid_alloc();
-    return (asid << (1 + LOG2NENV)) | (1 << LOG2NENV) | idx;
-}
 
 /* Overview:
  *  Convert an envid to an env pointer.
@@ -97,7 +103,9 @@ int envid2env(u_int envid, struct Env **penv, int checkperm)
 		return 0;
 	}
 	e = envs+ENVX(envid);
-
+	e->waiting=0;
+	e->using1=0;
+	e->using2=0;
 
     if (e->env_status == ENV_FREE || e->env_id != envid) {
         *penv = 0;
@@ -246,7 +254,9 @@ env_alloc(struct Env **new, u_int parent_id)
 	e->env_id = mkenvid(e);
 	e->env_parent_id = parent_id;
 	e->env_status = ENV_RUNNABLE;
-
+	e->waiting = 0;
+	e->using1 = 0;
+	e->using2 = 0;
     /* Step 4: Focus on initializing the sp register and cp0_status of env_tf field, located at this new Env. */
     e->env_tf.cp0_status = 0x10001004;
 	e->env_tf.regs[29] = USTACKTOP;
@@ -667,3 +677,88 @@ void load_icode_check() {
     printf("load_icode_check() succeeded!\n");
 }
 
+void S_init(int s, int num) {
+	S[s] = num;
+}
+int P(struct Env* e, int s) {
+	if(e->waiting) {
+		return -1;
+	}
+	if(S[s]>0) {
+		S[s]--;
+		if(s==1){
+			e->using1++;
+		}
+		else {
+			e->using2++;
+		}
+	}
+	else {
+		e->waiting=1;
+		if(s==1){
+			waitlist1[tail1]=e;
+			tail1++;
+		}
+		else {
+			waitlist2[tail2]=e;
+            tail2++;
+		}
+	}
+	return 0;
+}
+int V(struct Env* e, int s) {
+	struct Env* te;
+	if(e->waiting){
+		return -1;
+	}
+	if(s==1){
+		if(e->using1>0){
+			e->using1--;
+		}
+		if(S[1]==0){
+			if(head1==tail1) {
+				S[1]++;
+			}
+			else {
+				te = waitlist1[head1];
+				head1++;
+				te->waiting=0;
+				te->using1++;
+			}
+		}
+		else {
+			S[1]++;
+		}
+	}
+	else {
+		if(e->using2>0){
+			e->using2--;
+		}
+		if(S[2]==0){
+            if(head2==tail2) {
+                S[2]++;
+            }
+            else {
+                te = waitlist2[head2];
+                head2++;
+                te->waiting=0;
+				te->using2++;
+            }
+        }
+        else {
+            S[2]++;
+        }
+	}
+	return 0;
+}
+int get_status(struct Env* e) {
+	if(e->waiting) return 1;
+	if(e->using1) return 2;
+	if(e->using2) return 2;
+	return 3;
+}
+int my_env_create() {
+	struct Env *e;
+	env_alloc(&e, 0);
+	return e->env_id;
+}
