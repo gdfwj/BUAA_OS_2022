@@ -31,6 +31,8 @@ static u_int asid_bitmap[2] = {0}; // 64
  *  return the allocated ASID on success
  *  panic when too many processes are running
  */
+int used_asid[70]={0};
+u_int ban=4;
 static u_int asid_alloc() {
     int i, index, inner;
     for (i = 0; i < 64; ++i) {
@@ -43,7 +45,33 @@ static u_int asid_alloc() {
     }
     panic("too many processes!");
 }
-
+u_int exam_env_run(struct Env *e) {
+	int i=0;
+	for(i=0;i<=63;i++){
+		if(used_asid[i]==0){
+			e->env_asid = (ban<<6)+i;
+			used_asid[i] = 1;
+			return 0;
+		}
+	}
+	ban++;
+	for(i=0;i<=63;i++){
+		used_asid[i] = 0;
+	}
+	used_asid[0]=1;
+	e->env_asid=(ban<<6);
+	return 1;
+}
+void exam_env_free(struct Env *e) {
+	u_int n_ban=e->env_asid>>6;
+	if(n_ban==0){
+		return;
+	}
+	if(n_ban==ban){
+		int h_asid = e->env_asid & 0x3f;
+		used_asid[h_asid] = 0;
+	}
+}
 /* Overview:
  *  When a process is killed, free its ASID
  *
@@ -66,11 +94,20 @@ static void asid_free(u_int i) {
  * Post-Condition:
  *  return e's envid on success
  */
-u_int mkenvid(struct Env *e) {
-    u_int idx = e - envs;
-    u_int asid = asid_alloc();
-    return (asid << (1 + LOG2NENV)) | (1 << LOG2NENV) | idx;
+//u_int mkenvid(struct Env *e) {
+//    u_int idx = e - envs;
+//    u_int asid = asid_alloc();
+//    return (asid << (1 + LOG2NENV)) | (1 << LOG2NENV) | idx;
+//}
+u_int mkenvid(struct Env *e)
+{
+	/*Hint: lower bits of envid hold e's position in the envs array. */
+	u_int idx = (u_int)e - (u_int)envs;
+	idx /= sizeof(struct Env);
+	/*Hint: avoid envid being zero. */
+	return (1 << (LOG2NENV)) | idx; //LOG2NENV=10
 }
+
 
 /* Overview:
  *  Convert an envid to an env pointer.
@@ -136,7 +173,7 @@ env_init(void)
     int i;
     /* Step 1: Initialize env_free_list. */
 	LIST_INIT(&env_free_list);
-
+	ban=4;
     /* Step 2: Traverse the elements of 'envs' array,
      *   set their status as free and insert them into the env_free_list.
      * Choose the correct loop order to finish the insertion.
@@ -246,7 +283,7 @@ env_alloc(struct Env **new, u_int parent_id)
 	e->env_id = mkenvid(e);
 	e->env_parent_id = parent_id;
 	e->env_status = ENV_RUNNABLE;
-
+	e->env_asid = 0;
     /* Step 4: Focus on initializing the sp register and cp0_status of env_tf field, located at this new Env. */
     e->env_tf.cp0_status = 0x10001004;
 	e->env_tf.regs[29] = USTACKTOP;

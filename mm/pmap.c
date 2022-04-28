@@ -54,6 +54,7 @@ static void *alloc(u_int n, u_int align, int clear)
 	 * linker did *not* assign to any kernel code or global variables. */
 	if (freemem == 0) {
 		freemem = (u_long)end;
+		//printf("%x", freemem);
 	}
 
 	/* Step 1: Round up `freemem` up to be aligned properly */
