@@ -47,6 +47,14 @@ static u_int asid_alloc() {
 }
 u_int exam_env_run(struct Env *e) {
 	int i=0;
+	if(e->env_asid>>6==ban){
+		return 0;
+	}
+	if(used_asid[(e->env_asid) & 0x3f]==0){
+		e->env_asid = (ban<<6)+(e->env_asid & 0x3f);
+		used_asid[(e->env_asid) & 0x3f]=1;
+		return 0;
+	}
 	for(i=0;i<=63;i++){
 		if(used_asid[i]==0){
 			e->env_asid = (ban<<6)+i;
