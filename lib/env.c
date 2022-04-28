@@ -379,7 +379,7 @@ load_icode(struct Env *e, u_char *binary, u_int size)
 	if(r<0){
 		return;
 	}
-	page_insert(e->env_pgdir, p,USTACKTOP - BY2PG, perm);
+	r= page_insert(e->env_pgdir, p,USTACKTOP - BY2PG, perm);
 	if(r<0){
 		return;
 	}
