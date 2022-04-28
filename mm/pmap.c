@@ -698,3 +698,14 @@ void pageout(int va, int context)
 	printf("pageout:\t@@@___0x%x___@@@  ins a page \n", va);
 }
 
+void check_page_loc() {
+    int i = 0;
+    struct Page *tmp;
+    LIST_FOREACH(tmp, &page_free_list, pp_link) {
+        //printf("%x\n", page2kva(tmp));
+        i++;
+		//if(i==10) panic("end");
+    }   
+    printf("number of pages: %d\n", i); 
+    printf("page_loc checked!\n");
+}

@@ -12,7 +12,7 @@ void mips_init()
 
 	mips_vm_init();
 	page_init();
-
+	//check_page_loc();
 	env_init();
 	env_check();
 	load_icode_check();

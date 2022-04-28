@@ -78,7 +78,7 @@ int page_insert(Pde *pgdir, struct Page *pp, u_long va, u_int perm);
 struct Page* page_lookup(Pde *pgdir, u_long va, Pte **ppte);
 void page_remove(Pde *pgdir, u_long va) ;
 void tlb_invalidate(Pde *pgdir, u_long va);
-
+void check_page_loc();
 void boot_map_segment(Pde *pgdir, u_long va, u_long size, u_long pa, int perm);
 
 extern struct Page *pages;
