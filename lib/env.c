@@ -319,6 +319,12 @@ static int load_icode_mapper(u_long va, u_int32_t sgsize,
     }
 	offset = va+i - ROUNDDOWN(va+i, BY2PG);
 	if(offset){
+		if(offset&0x3) {
+			lsize = 4 -(offset&0x3);
+			bzero((void*)(page2kva(p)+offset),lsize);
+			offset+=lsize;
+			i+=lsize;
+		}
 		if(sgsize - i < BY2PG - offset){
 			lsize = sgsize-i;
 		}
