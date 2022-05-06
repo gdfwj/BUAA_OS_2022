@@ -318,13 +318,13 @@ static int load_icode_mapper(u_long va, u_int32_t sgsize,
         /* Hint: You should alloc a new page. */
     }
 	offset = va + i - ROUNDDOWN(va+i, BY2PG);
-	if(i&3) {
-		lsize=MIN(sgsize-i, ROUNDDOWN(i, 4) +4-i);
-		bzero((void*)page2kva(p)+offset, lsize);
-		i+=lsize;
-	}
-	offset = va + i - ROUNDDOWN(va+i, BY2PG);
 	if(offset){
+		if(offset&0x3) {
+			lsize=4-(offset&3);
+			bzero((void*)(page2kva(p)+offset),lsize);
+			offset=offset+lsize;
+			i+=lsize;
+		}
 		if(sgsize - i < BY2PG - offset){
 			lsize = sgsize-i;
 		}
