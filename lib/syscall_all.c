@@ -67,6 +67,10 @@ u_int sys_getenvid(void)
 /*** exercise 4.6 ***/
 void sys_yield(void)
 {
+	bcopy((void*)KERNEL_SP - sizeof(struct Trapframe),
+		  (void*)TIMESTACK - sizeof(struct Trapframe),
+		  sizeof(struct Trapframe));
+    sched_yield();
 }
 
 /* Overview:
@@ -146,7 +150,28 @@ int sys_mem_alloc(int sysno, u_int envid, u_int va, u_int perm)
 	struct Page *ppage;
 	int ret;
 	ret = 0;
-
+	if(va>=UTOP) {
+		return -E_INVAL;
+	}
+	if(perm & PTE_COW) {
+		return -E_INVAL;
+	}
+	if(!(perm & PTE_V)) {
+		return -E_INVAL;
+	}
+	ret = envid2env(envid,&env,0);
+	if (ret<0) {
+		return ret;
+	}
+	ret = page_alloc(&ppage);
+	if (ret<0) {
+		return ret;
+	}
+	ret = page_insert(env->env_pgdir, ppage, va, perm);
+	if(ret<0) {
+		return ret;
+	}
+	return 0;
 }
 
 /* Overview:
@@ -179,7 +204,31 @@ int sys_mem_map(int sysno, u_int srcid, u_int srcva, u_int dstid, u_int dstva,
 	round_dstva = ROUNDDOWN(dstva, BY2PG);
 
     //your code here
-
+	if(!(perm&PTE_V)) {
+		return -E_INVAL;
+	}
+	if(srcva>=UTOP||dstva>=UTOP) {
+		return -E_INVAL;
+	}
+	ret=envid2env(srcid,&srcenv,0);
+	if(ret<0) {
+		return ret;
+	}
+	ret=envid2env(dstid,&dstenv,0);
+	if (ret<0) {
+		return ret;
+	}
+	ppage=page_lookup(srcenv->env_pgdir,round_srcva,&ppte);
+	if(ppage==NULL) {
+		return E_INVAL;
+	}
+	if((*ppte&PTE_R==0)&&(perm&PTE_R==1)) {
+		return E_INVAL;
+	}
+	ret = page_insert(dstenv->env_pgdir, ppage, round_dstva, perm);
+	if(ret<0) {
+		return ret;
+	}
 	return ret;
 }
 
@@ -198,7 +247,14 @@ int sys_mem_unmap(int sysno, u_int envid, u_int va)
 	// Your code here.
 	int ret;
 	struct Env *env;
-
+	if (va>=UTOP) {
+		return -E_INVAL;
+	}
+	ret=envid2env(envid,&env,1);
+	if(ret<0) {
+		return ret;
+	}
+	page_remove(env->env_pgdir,va);
 	return ret;
 	//	panic("sys_mem_unmap not implemented");
 }
