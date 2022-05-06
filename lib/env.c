@@ -246,7 +246,7 @@ env_alloc(struct Env **new, u_int parent_id)
 	e->env_id = mkenvid(e);
 	e->env_parent_id = parent_id;
 	e->env_status = ENV_RUNNABLE;
-
+	e->env_runs = 0;
     /* Step 4: Focus on initializing the sp register and cp0_status of env_tf field, located at this new Env. */
     e->env_tf.cp0_status = 0x1000100c;
 	e->env_tf.regs[29] = USTACKTOP;
@@ -378,7 +378,7 @@ load_icode(struct Env *e, u_char *binary, u_int size)
     struct Page *p = NULL;
     u_long entry_point;
     u_long r;
-    u_long perm = PTE_R;
+    u_long perm = PTE_R|PTE_V;
 
     /* Step 1: alloc a page. */
 	r = page_alloc(&p);
@@ -413,7 +413,10 @@ env_create_priority(u_char *binary, int size, int priority)
 {
     struct Env *e;
     /* Step 1: Use env_alloc to alloc a new env. */
-	env_alloc(&e, 0);
+	//env_alloc(&e, 0);
+	if(env_alloc(&e, 0)) {
+        return;
+    }
     /* Step 2: assign priority to the new env. */
 	e->env_pri = priority;
     /* Step 3: Use load_icode() to load the named elf binary,
@@ -531,14 +534,14 @@ env_run(struct Env *e)
 	curenv = e;
 
     /* Step 3: Use lcontext() to switch to its address space. */
-	lcontext(e->env_pgdir);
+	lcontext((u_int)curenv->env_pgdir);
     /* Step 4: Use env_pop_tf() to restore the environment's
      *   environment   registers and return to user mode.
      *
      * Hint: You should use GET_ENV_ASID there. Think why?
      *   (read <see mips run linux>, page 135-144)
      */
-	env_pop_tf(&(e->env_tf), GET_ENV_ASID(e->env_id));
+	env_pop_tf(&(curenv->env_tf), GET_ENV_ASID(curenv->env_id));
 }
 
 void env_check()
