@@ -216,6 +216,7 @@ void page_init(void)
 		now->pp_ref = 0;
 		LIST_INSERT_HEAD(&page_free_list, now, pp_link);
 	}
+	//printf("last page:%x\n",page2pa(now-1));
 	LIST_REMOVE(pa2page(PADDR(TIMESTACK-BY2PG)), pp_link);
 }
 

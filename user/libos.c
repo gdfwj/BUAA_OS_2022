@@ -23,6 +23,7 @@ libmain(int argc, char **argv)
 	envid = ENVX(envid);
 	env = &envs[envid];
 	// call user main routine
+	//writef("call user main");
 	umain(argc, argv);
 	// exit gracefully
 	exit();
