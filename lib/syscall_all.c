@@ -404,15 +404,15 @@ int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva,
     e->env_ipc_value = value;
     e->env_status = ENV_RUNNABLE;
 	if(srcva) {
-        r = sys_mem_map(sysno,
-                        curenv->env_id,
-                        srcva,
-                        envid,
-                        e->env_ipc_dstva,
-                        perm);
-        if (r!=0) {
-            return r;
-        }
+        //r = sys_mem_map(sysno,curenv->env_id,srcva,envid,e->env_ipc_dstva,perm);
+        //if (r!=0) {
+        //    return r;
+        //}
+		p = page_lookup(curenv->env_pgdir, srcva, NULL);
+		if (p == NULL) {
+			return -E_INVAL;
+		}
+		page_insert(e->env_pgdir, p, e->env_ipc_dstva, perm);
         e->env_ipc_perm = perm;
     }
 	return 0;
