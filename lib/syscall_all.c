@@ -162,7 +162,7 @@ int sys_mem_alloc(int sysno, u_int envid, u_int va, u_int perm)
 	if(!(perm & PTE_V)) {
 		return -E_INVAL;
 	}
-	ret = envid2env(envid,&env,1);
+	ret = envid2env(envid,&env,0);
 	if (ret<0) {
 		return ret;
 	}
@@ -208,10 +208,10 @@ int sys_mem_map(int sysno, u_int srcid, u_int srcva, u_int dstid, u_int dstva,
 	round_srcva = ROUNDDOWN(srcva, BY2PG);
 	round_dstva = ROUNDDOWN(dstva, BY2PG);
 
-    //your code here
-	//if(!(perm&PTE_V)) {
-	//	return -E_INVAL;
-	//}
+   // your code here
+	if(!(perm&PTE_V)) {
+		return -E_INVAL;
+	}
 	if(srcva>=UTOP||dstva>=UTOP) {
 		return -E_INVAL;
 	}
