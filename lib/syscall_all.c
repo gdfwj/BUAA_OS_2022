@@ -413,7 +413,7 @@ int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva,
 			return -E_INVAL;
 		}
 		page_insert(e->env_pgdir, p, e->env_ipc_dstva, perm);
-        e->env_ipc_perm = perm;
     }
+	e->env_ipc_perm=perm;
 	return 0;
 }
