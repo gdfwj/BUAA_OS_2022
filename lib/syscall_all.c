@@ -52,7 +52,6 @@ void *memcpy(void *destaddr, void const *srcaddr, u_int len)
  */
 u_int sys_getenvid(void)
 {
-	//printf("sys_getenvid %d\n", curenv->env_id);
 	return curenv->env_id;
 }
 
@@ -68,12 +67,12 @@ u_int sys_getenvid(void)
 /*** exercise 4.6 ***/
 void sys_yield(void)
 {
-	printf("sys_yield begin");
+	//printf("sys_yield begin");
 	bcopy((void*)KERNEL_SP - sizeof(struct Trapframe),
 		  (void*)TIMESTACK - sizeof(struct Trapframe),
 		  sizeof(struct Trapframe));
     sched_yield();
-	printf("sys_yield finsh");
+	//printf("sys_yield finsh");
 }
 
 /* Overview:
@@ -149,7 +148,7 @@ int sys_set_pgfault_handler(int sysno, u_int envid, u_int func, u_int xstacktop)
 int sys_mem_alloc(int sysno, u_int envid, u_int va, u_int perm)
 {
 	// Your code here.
-	printf("sys_mem_alloc begin\n");
+	//printf("sys_mem_alloc begin\n");
 	struct Env *env;
 	struct Page *ppage;
 	int ret;
@@ -175,7 +174,7 @@ int sys_mem_alloc(int sysno, u_int envid, u_int va, u_int perm)
 	if(ret<0) {
 		return ret;
 	}
-	printf("sys_mem_alloc return 0\n");
+	//printf("sys_mem_alloc return 0\n");
 	return 0;
 }
 
@@ -196,7 +195,7 @@ int sys_mem_alloc(int sysno, u_int envid, u_int va, u_int perm)
 int sys_mem_map(int sysno, u_int srcid, u_int srcva, u_int dstid, u_int dstva,
 				u_int perm)
 {
-	printf("sys_mem_map begin\n");
+	//printf("sys_mem_map begin\n");
 	int ret;
 	u_int round_srcva, round_dstva;
 	struct Env *srcenv;
@@ -236,7 +235,7 @@ int sys_mem_map(int sysno, u_int srcid, u_int srcva, u_int dstid, u_int dstva,
 	if(ret<0) {
 		return ret;
 	}
-	printf("sys_mem_map return 0\n");
+	//printf("sys_mem_map return 0\n");
 	return ret;
 }
 
@@ -253,7 +252,7 @@ int sys_mem_map(int sysno, u_int srcid, u_int srcva, u_int dstid, u_int dstva,
 int sys_mem_unmap(int sysno, u_int envid, u_int va)
 {
 	// Your code here.
-	printf("sys_mem_unmap begin\n");
+	//printf("sys_mem_unmap begin\n");
 	int ret;
 	struct Env *env;
 	if (va>=UTOP) {
@@ -264,7 +263,7 @@ int sys_mem_unmap(int sysno, u_int envid, u_int va)
 		return ret;
 	}
 	page_remove(env->env_pgdir,va);
-	printf("sys_mem_unmap return 0\n");
+	//printf("sys_mem_unmap return 0\n");
 	return ret;
 	//	panic("sys_mem_unmap not implemented");
 }

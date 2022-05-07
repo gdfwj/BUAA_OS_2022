@@ -242,7 +242,7 @@ int page_alloc(struct Page **pp)
 	// negative return value indicates exception.
 
 	ppage_temp = LIST_FIRST(&page_free_list);
-
+	//printf("remove %x\n", page2pa(ppage_temp));
     LIST_REMOVE(ppage_temp, pp_link);
 
     bzero(page2kva(ppage_temp), BY2PG);
@@ -371,6 +371,7 @@ int page_insert(Pde *pgdir, struct Page *pp, u_long va, u_int perm)
     /* Step 2. fill in the page table */
     *pgtable_entry = (page2pa(pp)) | PERM;
     pp->pp_ref++;
+	//printf("page insert %x to %x\n", page2pa(pp), pgdir);
     return 0;
 
 	/* Step 2: Update TLB. */

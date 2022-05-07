@@ -325,7 +325,7 @@ static int load_icode_mapper(u_long va, u_int32_t sgsize,
 	if(offset){
 		if(offset&0x3) {
 			lsize=4-(offset&0x3);
-			bzero((void*)(page2kva(p)+offset),lsize);
+			//bzero((void*)(page2kva(p)+offset),lsize);
 			//printf("seg map not 4 p from %x to %x v from %x to %x\n", page2pa(p)+offset, page2pa(p)+offset+lsize, va+i, va+i+lsize);
 			offset=offset+lsize;
 			i+=lsize;
@@ -336,7 +336,7 @@ static int load_icode_mapper(u_long va, u_int32_t sgsize,
 		else{
 			lsize = BY2PG - offset;
 		}
-		bzero((void*)(page2kva(p)+offset), lsize);
+		//bzero((void*)(page2kva(p)+offset), lsize);
 		//printf("seg map 1 p from %x to %x v from %x to %x\n", page2pa(p)+offset, page2pa(p)+offset+lsize, va+i, va+i+lsize);
 		i+=lsize;
 	}
@@ -357,7 +357,7 @@ static int load_icode_mapper(u_long va, u_int32_t sgsize,
 			}
 			page_insert(env->env_pgdir, p, va+i, PTE_R);
 		}
-		bzero((void*)(page2kva(p)), lsize);
+		//bzero((void*)(page2kva(p)), lsize);
 		//printf("seg map 2 p from %x to %x v from %x to %x\n", page2pa(p), page2pa(p)+lsize, va+i, va+i+lsize);
 		i+=lsize;
 	}
@@ -389,7 +389,7 @@ load_icode(struct Env *e, u_char *binary, u_int size)
     struct Page *p = NULL;
     u_long entry_point;
     u_long r;
-    u_long perm = PTE_R|PTE_V;
+    u_long perm = PTE_R;
 
     /* Step 1: alloc a page. */
 	r = page_alloc(&p);
@@ -398,6 +398,7 @@ load_icode(struct Env *e, u_char *binary, u_int size)
 	}
 	r= page_insert(e->env_pgdir, p,USTACKTOP - BY2PG, perm);
 	if(r<0){
+		//printf("insert false\n");
 		return;
 	}
     /* Step 2: Use appropriate perm to set initial stack for new Env. */
@@ -427,6 +428,7 @@ env_create_priority(u_char *binary, int size, int priority)
 	//printf("binary: %x, size: %d\n", binary, size);
     /* Step 1: Use env_alloc to alloc a new env. */
 	r = env_alloc(&e, 0);
+	//printf("pgdir:%x\n", e->env_pgdir);
 	if(r<0) {
         return;
     }
@@ -545,7 +547,7 @@ env_run(struct Env *e)
 	}
     /* Step 2: Set 'curenv' to the new environment. */
 	curenv = e;
-
+	curenv->env_runs++;
     /* Step 3: Use lcontext() to switch to its address space. */
 	lcontext((u_int)curenv->env_pgdir);
     /* Step 4: Use env_pop_tf() to restore the environment's
