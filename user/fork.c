@@ -83,16 +83,30 @@ static void
 pgfault(u_int va)
 {
 	u_int *tmp;
+	int ret;
+	va = ROUNDDOWN(va, BY2PG);
 	//	writef("fork.c:pgfault():\t va:%x\n",va);
-
+	if ((((Pte*)(*vpt))[VPN(va)]&PTE_COW) == 0) {
+        user_panic("User pgfault haddler facing a non-COW page\n");
+    }
 	//map the new page at a temporary place
-
+	tmp = USTACKTOP;
+    ret = syscall_mem_alloc(0, tmp, PTE_V|PTE_R);
+    if (ret<0) {
+        user_panic("User pgfault haddler mem_alloc faild\n");
+    }
 	//copy the content
-
+	user_bcopy(va, tmp, BY2PG);
 	//map the page on the appropriate place
-
+	ret = syscall_mem_map(0, tmp, 0, va, PTE_V|PTE_R);
+	if (ret<0) {
+        user_panic("User pgfault haddler mem_map faild\n");
+    }
 	//unmap the temporary place
-
+	ret = syscall_mem_unmap(0, tmp);
+    if (ret<0) {
+        user_panic("User pgfault haddler mem_unmap failed\n");
+    }
 }
 
 /* Overview:
@@ -117,7 +131,32 @@ duppage(u_int envid, u_int pn)
 {
 	u_int addr;
 	u_int perm;
-
+	addr = pn*BY2PG;
+    perm = ((Pte*)(*vpt))[pn] & 0x0fff;
+	if ((perm&PTE_R)==0) {
+        if (syscall_mem_map(0, addr, envid, addr, perm)!=0) {
+            user_panic("failed to dup read-only PTE\n");
+        }
+    }
+    else if (perm&PTE_LIBRARY) {
+        if (syscall_mem_map(0, addr, envid, addr, perm)!=0) {
+            user_panic("failed to dup LIBARAY PTE\n");
+        }
+    }
+    else if (perm&PTE_COW) {
+		if ((syscall_mem_map(0, addr, envid, addr, perm))!=0) {
+            user_panic("failed to dup PTE with COW in child env\n");
+         }
+        if (syscall_mem_map(0, addr, envid, addr, perm)!=0) {
+            user_panic("failed to dup PTE which has been duplicated before\n");
+        }
+    }
+	else {
+		perm = perm | PTE_COW;
+		if (syscall_mem_map(0, addr, 0, addr, perm)!=0) {
+            user_panic("failed to dup PTE with COW in father env\n");
+         }
+	}
 	//	user_panic("duppage not implemented");
 }
 
@@ -140,10 +179,47 @@ fork(void)
 	extern struct Env *envs;
 	extern struct Env *env;
 	u_int i;
-
-
+	int j,k,ret;
+	Pde* pgdir_entry=(Pde*)vpd;
+	Pte* pgtable_entry=(Pte*)vpt;
+	
 	//The parent installs pgfault using set_pgfault_handler
 
+	newenvid = syscall_env_alloc();
+	if(newenvid==0) {
+		env = &envs[ENVX(syscall_getenvid())];
+		return 0;
+	}
+	//for(j=0;j<1024;j++) {
+	//	if((*(pgdir_entry+j))&PTE_V){
+	//		pgtable_entry = KADDR(*(pgdir_entry+i));
+	//		for(k=0;k<1024;k++) {
+	//			if((*(pgtable_entry+k))&PTE_V) {
+	//				i=KADDR(*(pgtable_entry+k));
+	//				duppage(newenvid, VPN(i));
+	//			}
+	//		}
+	//	}
+	//}
+	for (i=0; i < USTACKTOP; i+=BY2PG) {
+        if ((((Pde*)(*vpd))[i>>PDSHIFT]&PTE_V) &&
+            (((Pte*)(*vpt))[i>>PGSHIFT]&PTE_V)) {
+                duppage(newenvid, VPN(i));
+            }
+    }
+	ret = syscall_mem_alloc(newenvid, UXSTACKTOP-BY2PG, PTE_V | PTE_R);
+    if (ret<0) {
+       user_panic("fork alloc mem failed\n");
+	}
+	ret = syscall_set_pgfault_handler(newenvid, __asm_pgfault_handler, UXSTACKTOP);
+    if (ret<0) {
+        user_panic("fork set pgfault_handler failed\n");
+    }
+    ret = syscall_set_env_status(newenvid, ENV_RUNNABLE);
+    if (ret<0) {
+        user_panic("fork set status failed\n");
+    }
+	
 	//alloc a new alloc
 
 

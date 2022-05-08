@@ -121,8 +121,11 @@ int sys_set_pgfault_handler(int sysno, u_int envid, u_int func, u_int xstacktop)
 	// Your code here.
 	struct Env *env;
 	int ret;
-
-
+	if(ret=envid2env(envid, &env, 0)!=0) {
+		return ret;
+	}
+	env->env_pgfault_handler = func;
+	env->env_xstacktop = xstacktop;
 	return 0;
 	//	panic("sys_set_pgfault_handler not implemented");
 }
@@ -230,7 +233,7 @@ int sys_mem_map(int sysno, u_int srcid, u_int srcva, u_int dstid, u_int dstva,
 	if((*ppte&PTE_R==0)&&(perm&PTE_R==1)) {
 		return -E_INVAL;
 	}
-	ppage=pa2page(PTE_ADDR(*ppte));
+	//ppage=pa2page(PTE_ADDR(*ppte));
 	ret = page_insert(dstenv->env_pgdir, ppage, round_dstva, perm);
 	if(ret<0) {
 		return ret;
@@ -315,7 +318,18 @@ int sys_set_env_status(int sysno, u_int envid, u_int status)
 	// Your code here.
 	struct Env *env;
 	int ret;
-
+	if(status!=ENV_RUNNABLE && status!=ENV_NOT_RUNNABLE && status!=ENV_FREE) {
+		return -E_INVAL;
+	}
+	ret = envid2env(envid, &env, 0);
+	if(ret<0) return ret;
+	env->env_status = status;
+	if(status==ENV_RUNNABLE) {
+		LIST_INSERT_HEAD(&env_sched_list[0], env, env_sched_link);
+	}
+	else if(status==ENV_NOT_RUNNABLE) {
+		LIST_REMOVE(env, env_sched_link);
+	}
 	return 0;
 	//	panic("sys_env_set_status not implemented");
 }
