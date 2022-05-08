@@ -230,7 +230,7 @@ int sys_mem_map(int sysno, u_int srcid, u_int srcva, u_int dstid, u_int dstva,
 	if((*ppte&PTE_R==0)&&(perm&PTE_R==1)) {
 		return -E_INVAL;
 	}
-	//ppage=pa2page(PTE_ADDR(*ppte));
+	ppage=pa2page(PTE_ADDR(*ppte));
 	ret = page_insert(dstenv->env_pgdir, ppage, round_dstva, perm);
 	if(ret<0) {
 		return ret;
@@ -286,7 +286,12 @@ int sys_env_alloc(void)
 	// Your code here.
 	int r;
 	struct Env *e;
-
+	if(r=env_alloc(&e, curenv->env_id)<0) return r;
+	e->env_status = ENV_NOT_RUNNABLE;
+    bcopy(&(curenv->env_tf), &(e->env_tf), sizeof(struct Trapframe));
+	e->env_tf.pc = e->env_tf.cp0_epc;
+    e->env_tf.regs[2] = 0;
+	e->env_pri = curenv->env_pri;
 
 	return e->env_id;
 	//	panic("sys_env_alloc not implemented");
