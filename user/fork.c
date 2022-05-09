@@ -131,14 +131,15 @@ duppage(u_int envid, u_int pn)
 {
 	u_int addr;
 	u_int perm;
-
+	int flag=0;
 	addr = pn <<PGSHIFT;
 	perm = (*vpt)[pn] & 0xfff;
 	if((perm & PTE_R) && (!(perm & PTE_LIBRARY))) {
 		perm = PTE_COW | perm;
-		syscall_mem_map(0, addr, 0, addr, perm);
+		flag=1;
 	}
 	syscall_mem_map(0, addr, envid, addr, perm);
+	if(flag==1) syscall_mem_map(0, addr, 0, addr, perm);
 	//writef("dumppage return");
 
 	//	user_panic("duppage not implemented");
@@ -168,6 +169,7 @@ fork(void)
 	Pte* pgtable_entry=(Pte*)vpt;
 	
 	//The parent installs pgfault using set_pgfault_handler
+	set_pgfault_handler(pgfault);
 	//writef("fork begin\n");
 	//writef("call syscall_env_alloc\n");
 	newenvid = syscall_env_alloc();
