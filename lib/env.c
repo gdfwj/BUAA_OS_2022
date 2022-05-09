@@ -545,6 +545,7 @@ env_run(struct Env *e)
 		bcopy(old, &(curenv->env_tf), sizeof(struct Trapframe));
 		curenv->env_tf.pc = curenv->env_tf.cp0_epc;
 	}
+	//printf("run %d\n",e->env_id);
     /* Step 2: Set 'curenv' to the new environment. */
 	curenv = e;
 	curenv->env_runs++;

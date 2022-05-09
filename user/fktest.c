@@ -10,7 +10,6 @@ void umain()
 		writef("fk 1 ready\n");
 		if ((id = fork()) == 0) {
 			a += 3;
-
 			for (;;) {
 				writef("\t\tthis is child2 :a:%d\n", a);
 			}

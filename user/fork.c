@@ -82,7 +82,7 @@ void user_bzero(void *v, u_int n)
 static void
 pgfault(u_int va)
 {
-	u_int *tmp;
+	u_int tmp;
 	int ret;
 	va = ROUNDDOWN(va, BY2PG);
 	//	writef("fork.c:pgfault():\t va:%x\n",va);
@@ -91,14 +91,14 @@ pgfault(u_int va)
     }
 	//map the new page at a temporary place
 	tmp = USTACKTOP;
-    ret = syscall_mem_alloc(0, tmp, PTE_V|PTE_R);
+    ret = syscall_mem_alloc(0, tmp, ((Pte*)(*vpt))[VPN(va)]&(~PTE_COW)&0xfff);
     if (ret<0) {
         user_panic("User pgfault haddler mem_alloc faild\n");
     }
 	//copy the content
-	user_bcopy(va, tmp, BY2PG);
+	user_bcopy((void*)ROUNDDOWN(va,BY2PG), (void*)tmp, BY2PG);
 	//map the page on the appropriate place
-	ret = syscall_mem_map(0, tmp, 0, va, PTE_V|PTE_R);
+	ret = syscall_mem_map(0, tmp, 0, va, ((Pte*)(*vpt))[VPN(va)]&(~PTE_COW)&0xfff);
 	if (ret<0) {
         user_panic("User pgfault haddler mem_map faild\n");
     }
@@ -165,8 +165,8 @@ fork(void)
 	extern struct Env *env;
 	u_int i;
 	int j,k,ret;
-	Pde* pgdir_entry=(Pde*)vpd;
-	Pte* pgtable_entry=(Pte*)vpt;
+	//Pde* pgdir_entry=(Pde*)vpd;
+	//Pte* pgtable_entry=(Pte*)vpt;
 	
 	//The parent installs pgfault using set_pgfault_handler
 	set_pgfault_handler(pgfault);
