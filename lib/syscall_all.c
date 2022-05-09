@@ -230,7 +230,7 @@ int sys_mem_map(int sysno, u_int srcid, u_int srcva, u_int dstid, u_int dstva,
 	if(ppage==NULL) {
 		return -E_INVAL;
 	}
-	if((*ppte&PTE_R==0)&&(perm&PTE_R==1)) {
+	if((*ppte&PTE_R==0)&&(perm&PTE_R)) {
 		return -E_INVAL;
 	}
 	//ppage=pa2page(PTE_ADDR(*ppte));

@@ -5,8 +5,9 @@ void umain()
 {
 	int a = 0;
 	int id = 0;
-
+	writef("fktest begin\n");
 	if ((id = fork()) == 0) {
+		writef("fk 1 ready\n");
 		if ((id = fork()) == 0) {
 			a += 3;
 

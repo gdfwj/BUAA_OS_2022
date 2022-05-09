@@ -133,8 +133,8 @@ duppage(u_int envid, u_int pn)
 	u_int perm;
 
 	addr = pn <<PGSHIFT;
-	perm = (*vpt)[pn] & (BY2PG - 1);
-	if((perm & PTE_R) && !(perm & PTE_LIBRARY)) {
+	perm = (*vpt)[pn] & 0xfff;
+	if((perm & PTE_R) && (!(perm & PTE_LIBRARY))) {
 		perm = PTE_COW | perm;
 		syscall_mem_map(0, addr, 0, addr, perm);
 	}

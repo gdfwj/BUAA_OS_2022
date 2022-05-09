@@ -284,7 +284,7 @@ static int load_icode_mapper(u_long va, u_int32_t sgsize,
 	int lsize;
     u_long offset = va - ROUNDDOWN(va, BY2PG);
 	i = 0;
-	//printf("bin_size: %d , sgsize: %d\n", bin_size, sgsize);
+	//printf("bin_size: %x , sgsize: %x\n", bin_size, sgsize);
     /* Step 1: load all content of bin into memory. */
 	if(offset){
 		p=page_lookup(env->env_pgdir, va, NULL);
@@ -361,7 +361,7 @@ static int load_icode_mapper(u_long va, u_int32_t sgsize,
 		//printf("seg map 2 p from %x to %x v from %x to %x\n", page2pa(p), page2pa(p)+lsize, va+i, va+i+lsize);
 		i+=lsize;
 	}
-//	printf("v bin from %x to %x , seg to %x\n", va, va+bin_size, va+sgsize);
+	//printf("v bin from %x to %x , seg to %x\n", va, va+bin_size, va+sgsize);
     return 0;
 }
 /* Overview:
