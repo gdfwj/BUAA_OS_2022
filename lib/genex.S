@@ -152,8 +152,37 @@ nop
 			nop
 END(do_refill)
 
+NESTED(do_change, 0, sp)
+	nop
+	lw          k0,TF_EPC(sp)
+	lw          k1,0(k0)
+	lui         t0,0x800
+	and			t1,k1,t0
+	bne			t1,zero,h_lw
+	nop
+	lui			t0,0x400
+	and			t1,k1,t0
+	bne			t1,zero,h_lh
+	nop
+	j			aend
+	nop
+		h_lw:
+			sub k1,k1,t0
+			j endb
+			nop
+		h_lh:
+			sub k1,k1,t0
+			j endb
+			nop
+	endb:
+		sw k1, 0(k0)
+	aend:
+		jr ra
+		nop
+END(do_change)
 
 
 BUILD_HANDLER reserved do_reserved cli
 BUILD_HANDLER tlb	do_refill	cli
 BUILD_HANDLER mod	page_fault_handler cli
+BUILD_HANDLER AdEL  do_change cli
