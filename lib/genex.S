@@ -180,7 +180,7 @@ NESTED(do_change, 0, sp)
 		nop
 	aend:
 		add k0,0x4
-		sw	k0,TF_SPC(sp)
+		sw	k0,TF_EPC(sp)
 	eend:
 		jr ra
 		nop
