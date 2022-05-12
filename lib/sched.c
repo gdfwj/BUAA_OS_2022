@@ -25,23 +25,24 @@ void sched_yield(void){
 				pp=nsch+2;
 			}
 			else pp=nsch+1;
-			if(pp==3) point=0;
-			if(pp==4) point=1;
-			LIST_INSERT_TAIL(&env_sched_list[point], e, env_sched_link);
-			//printf("insert in %d\n",point);
+			if(pp==3) pp=0;
+			if(pp==4) pp=1;
+			LIST_INSERT_TAIL(&env_sched_list[pp], e, env_sched_link);
+			//printf("insert in %d\n",pp);
 		}
 		while(flag==0){
 			if(!LIST_EMPTY(&env_sched_list[point])){
 				LIST_FOREACH(e, &env_sched_list[point], env_sched_link) {
 					if(e->env_status==ENV_RUNNABLE) {
 						flag=1;
-						nsch=0;
+						nsch=point;
 						count=(e->env_pri)<<point;
 						LIST_REMOVE(e, env_sched_link);
 						break;
 					}
 				}
 			}
+			if(flag==1) break;
 			point+=1;
 			if(point==3) point=0;
 		}
