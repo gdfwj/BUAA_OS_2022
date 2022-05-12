@@ -156,6 +156,19 @@ NESTED(do_change, 0, sp)
 	nop
 	lw          k0,TF_EPC(sp)
 	lw          k1,0(k0)
+	move		t2,k1
+
+	lui			t0,0xFC00
+	and			k1,k1,t0
+	lui			t0,0x8C00
+	beq			t0,k1,h_lw
+	nop
+	lui			t0,0x8400
+	beq			t0,k1,h_lh
+	nop
+	j			eend
+	nop
+
 	lui         t0,0x800
 	and			t1,k1,t0
 	bne			t1,zero,h_lw
@@ -164,23 +177,25 @@ NESTED(do_change, 0, sp)
 	and			t1,k1,t0
 	bne			t1,zero,h_lh
 	nop
-	j			aend
+	j eend
 	nop
 		h_lw:
-			sub k1,k1,t0
+			lui t0,0x800
+			sub t2,t2,t0
 			j endb
 			nop
 		h_lh:
-			sub k1,k1,t0
+			lui t0,0x400
+			sub t2,t2,t0
 			j endb
 			nop
 	endb:
-		sw k1, 0(k0)
+		sw t2, 0(k0)
 		j eend
 		nop
 	aend:
-		add k0,0x4
-		sw	k0,TF_EPC(sp)
+		//add k0,0x4
+		//sw	k0,TF_EPC(sp)
 	eend:
 		jr ra
 		nop
