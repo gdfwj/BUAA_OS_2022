@@ -166,7 +166,7 @@ NESTED(do_change, 0, sp)
 	lui			t0,0x8400
 	beq			t0,k1,h_lh
 	nop
-	j			eend
+	j			aend
 	nop
 
 	lui         t0,0x800
@@ -194,8 +194,8 @@ NESTED(do_change, 0, sp)
 		j eend
 		nop
 	aend:
-		//add k0,0x4
-		//sw	k0,TF_EPC(sp)
+		add k0,0x4
+		sw	k0,TF_EPC(sp)
 	eend:
 		jr ra
 		nop
