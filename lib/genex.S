@@ -176,7 +176,12 @@ NESTED(do_change, 0, sp)
 			nop
 	endb:
 		sw k1, 0(k0)
+		j eend
+		nop
 	aend:
+		add k0,0x4
+		sw	k0,TF_SPC(sp)
+	eend:
 		jr ra
 		nop
 END(do_change)
