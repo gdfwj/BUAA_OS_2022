@@ -12,36 +12,36 @@
  *  3. CANNOT use `return` statement!
  */
 /*** exercise 3.15 ***/
-void sched_yield(void)
-{
-    static int count = 0; // remaining time slices of current env
-    static int point = 0; // current env_sched_list index
-	static struct Env *e;
+//void sched_yield(void)
+//{
+//    static int count = 0; // remaining time slices of current env
+//    static int point = 0; // current env_sched_list index
+//	static struct Env *e;
 	//printf("count: %d\n",count);
-	if(count==0) {
+//	if(count==0) {
 		//while(1) {
-			if(e!=NULL){
-				LIST_REMOVE(e, env_sched_link);
-				LIST_INSERT_TAIL(&env_sched_list[1-point], e, env_sched_link);
-			}
-			if(LIST_EMPTY(&env_sched_list[point])) {
-				point = 1-point;
-			}
+			//if(e!=NULL){
+			//	LIST_REMOVE(e, env_sched_link);
+			//	LIST_INSERT_TAIL(&env_sched_list[1-point], e, env_sched_link);
+//			}
+//			if(LIST_EMPTY(&env_sched_list[point])) {
+//				point = 1-point;
+//			}
 			//e = LIST_FIRST(&env_sched_list[point]);
 			//if(e->env_status==ENV_RUNNABLE) {
 			//	break;
 			//}
-			LIST_FOREACH(e, &env_sched_list[point], env_sched_link) {
-				if(e->env_status==ENV_RUNNABLE) {
-					break;
-				}
-			}
+//			LIST_FOREACH(e, &env_sched_list[point], env_sched_link) {
+//				if(e->env_status==ENV_RUNNABLE) {
+//					break;
+//				}
+//			}
 		//}
-		count = e->env_pri;
-	}
-	count--;
-	env_run(e);
-}
+//		count = e->env_pri;
+//	}
+//	count--;
+//	env_run(e);
+//}
     /*  hint:
      *  1. if (count==0), insert `e` into `env_sched_list[1-point]`
      *     using LIST_REMOVE and LIST_INSERT_TAIL.
@@ -54,25 +54,52 @@ void sched_yield(void)
      *  functions or macros below may be used (not all):
      *  LIST_INSERT_TAIL, LIST_REMOVE, LIST_FIRST, LIST_EMPTY
      */
-//oid sched_yield(void){
-//	static int count = 0; // remaining time slices of current env
-  //  static int point = 0; // current env_sched_list index
-//    static struct Env *e;
-  //  if (count == 0 || (e->env_status != ENV_RUNNABLE)) {
-  //do {
-   //if (LIST_EMPTY(&env_sched_list[point])) {
-    //point = 1 - point;
-   //}
+void sched_yield(void){
+	static int count = 0; // remaining time slices of current env
+	static int point = 0; // current env_sched_list index
+	static int nsch = 0;
+    static struct Env *e;
+	int flag=0;
+	printf("\n");
+    if (count == 0 || (e->env_status != ENV_RUNNABLE)) {
+		if(e!=NULL) {
+			if(e->env_pri%2==0){
+				point=nsch+2;
+			}
+			else point=nsch+1;
+			if(point==3) point=0;
+			if(point==4) point=1;
+			LIST_INSERT_TAIL(&env_sched_list[point], e, env_sched_link);
+		}
+		LIST_FOREACH(e, &env_sched_list[0], env_sched_link) {
+			if(e->env_status==ENV_RUNNABLE) {
+				flag=1;
+				nsch=0;
+				count=e->env_pri;
+				break;
+			}
+		}
+		if(flag==0)
+		LIST_FOREACH(e, &env_sched_list[1], env_sched_link) {
+			if(e->env_status==ENV_RUNNABLE) {
+				flag=1;
+				nsch=0;
+				count=(e->env_pri)<<1;
+				break;
+			}
+		}
+		if(flag==0)
+		LIST_FOREACH(e, &env_sched_list[2], env_sched_link) {
+			if(e->env_status==ENV_RUNNABLE) {
+				flag=1;
+				nsch=0;
+				count=(e->env_pri)<<2;
+				break;
+			}
+		}
+		if(flag==0)panic("no runnable env\n");
+	}
+	count--;
+    env_run(e);
+}
 
-   //e = LIST_FIRST(&env_sched_list[point]);
-
-   //if (e != NULL) {
-    //LIST_REMOVE(e, env_sched_link);
-    //LIST_INSERT_TAIL(&env_sched_list[1 - point], e, env_sched_link);
-    //count = e->env_pri;
-   //}
- // } while (e == NULL || e->env_status != ENV_RUNNABLE);
- //}
-   // count--;
-    //env_run(e);
-//}
