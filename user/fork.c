@@ -134,7 +134,7 @@ duppage(u_int envid, u_int pn)
 	int flag=0;
 	addr = pn <<PGSHIFT;
 	perm = (*vpt)[pn] & 0xfff;
-	if((perm & PTE_R) && (!(perm & PTE_LIBRARY))) {
+	if((perm & PTE_R) && !(perm & PTE_LIBRARY)) {
 		perm = PTE_COW | perm;
 		flag=1;
 	}
