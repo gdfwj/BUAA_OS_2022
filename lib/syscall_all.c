@@ -7,7 +7,16 @@
 
 extern char *KERNEL_SP;
 extern struct Env *curenv;
-
+struct send{
+	u_int srcenvid;
+	u_int dstenvid;
+	u_int srcva;
+	u_int dstva;
+	u_int perm;
+	u_int value;
+}sending[1000];
+int head=0;
+int tail=0;
 /* Overview:
  * 	This function is used to print a character on screen.
  *
@@ -384,6 +393,30 @@ void sys_panic(int sysno, char *msg)
 void sys_ipc_recv(int sysno, u_int dstva)
 {
 	if (dstva>=UTOP) return;
+	int i,j;
+	struct Page *p;
+	struct Env *e_sed;
+	for(i=head;i<tail;i++) {
+		if(sending[i].dstenvid==curenv->env_id) {
+			envid2env(sending[i].srcenvid, &e_sed, 0);
+			curenv->env_ipc_from = sending[i].srcenvid;
+		    curenv->env_ipc_value = sending[i].value;
+			if(sending[i].srcva) {
+				p = page_lookup(e_sed->env_pgdir, sending[i].srcva, NULL);
+				if (p == NULL) {
+					return -E_INVAL;
+				}
+				page_insert(curenv->env_pgdir, p, sending[i].dstva, sending[i].perm);
+			}
+			curenv->env_ipc_perm=sending[i].perm;
+			e_sed->env_status = ENV_RUNNABLE;
+			for(j=i;j<tail-1;j++) {
+				sending[j] = sending[j+1];
+			}
+			tail--;
+			return;
+		}
+	}
     curenv->env_ipc_recving = 1;
     curenv->env_ipc_dstva = dstva;
     curenv->env_status = ENV_NOT_RUNNABLE;
@@ -417,7 +450,17 @@ int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva,
 	struct Page *p;
 	r = envid2env(envid, &e, 0);
     if (r<0) return r;
-	if(e->env_ipc_recving == 0) return -E_IPC_NOT_RECV;
+	if(e->env_ipc_recving == 0) {
+		sending[tail].dstenvid=envid;
+		sending[tail].srcenvid=curenv->env_id;
+		sending[tail].value=value;
+		sending[tail].srcva=srcva;
+		sending[tail].perm=perm;
+		tail++;
+		curenv->env_status = ENV_NOT_RUNNABLE;
+		sys_yield();
+		return 0;
+	}
 	e->env_ipc_recving = 0;
     e->env_ipc_from = curenv->env_id;
     e->env_ipc_value = value;
