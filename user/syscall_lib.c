@@ -9,6 +9,15 @@ void syscall_putchar(char ch)
 	msyscall(SYS_putchar, (int)ch, 0, 0, 0, 0);
 }
 
+int syscall_try_acquire_console(void)
+{
+	msyscall(SYS_try_acquire_console, 0, 0, 0, 0, 0);
+}
+
+int syscall_release_console(void)
+{
+	msyscall(SYS_release_console, 0, 0, 0, 0, 0);
+}
 
 u_int
 syscall_getenvid(void)

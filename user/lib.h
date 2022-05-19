@@ -124,6 +124,8 @@ int	read_map(int fd, u_int offset, void **blk);
 int	delete(const char *path);
 int	ftruncate(int fd, u_int size);
 int	sync(void);
+int syscall_try_acquire_console();
+int syscall_release_console();
 
 #define user_assert(x)	\
 	do {	if (!(x)) user_panic("assertion failed: %s", #x); } while (0)

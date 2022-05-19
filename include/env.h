@@ -38,6 +38,7 @@ struct Env {
 	// Lab 4 fault handling
 	u_int env_pgfault_handler;      // page fault state
 	u_int env_xstacktop;            // top of exception stack
+	int env_lock;
 
 	// Lab 6 scheduler counts
 	u_int env_runs;			// number of times been env_run'ed
