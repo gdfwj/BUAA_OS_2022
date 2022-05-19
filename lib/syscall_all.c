@@ -406,7 +406,7 @@ void sys_ipc_recv(int sysno, u_int dstva)
 				if (p == NULL) {
 					return -E_INVAL;
 				}
-				page_insert(curenv->env_pgdir, p, sending[i].dstva, sending[i].perm);
+				page_insert(curenv->env_pgdir, p, dstva, sending[i].perm);
 			}
 			curenv->env_ipc_perm=sending[i].perm;
 			e_sed->env_status = ENV_RUNNABLE;
