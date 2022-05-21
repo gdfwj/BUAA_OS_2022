@@ -464,7 +464,27 @@ int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva,
  /*** exercise 5.1 ***/
 int sys_write_dev(int sysno, u_int va, u_int dev, u_int len)
 {
-        // Your code here
+	int flag=0;
+	dev = dev+0xa0000000;
+	if(dev>=0xB0000000 && dev<=0xB0000020) {
+		if(len<=0xB0000020-dev) {
+			flag=1;
+		}
+	}
+	if(dev>=0xB300000 && dev<=0xB3004200) {
+		if(len<=0xB3004200-dev) {
+			flag=1;
+		}
+	}
+	if(dev>=0xB5000000 && dev<=0xB5000200) {
+		if(len<=0xB5000200-dev) {
+			flag=1;
+		}
+	}
+	if(flag==0) return -E_INVAL;
+	bcopy(va, dev, len);
+	return 0;
+    // Your code here
 }
 
 /* Overview:
@@ -486,5 +506,25 @@ int sys_write_dev(int sysno, u_int va, u_int dev, u_int len)
  /*** exercise 5.1 ***/
 int sys_read_dev(int sysno, u_int va, u_int dev, u_int len)
 {
+	int flag=0;
+	dev = dev+0xa0000000;
+	if(dev>=0xB0000000 && dev<=0xB0000020) {
+		if(len<=0xB0000020-dev) {
+			flag=1;
+		}
+	}
+	if(dev>=0xB300000 && dev<=0xB3004200) {
+		if(len<=0xB3004200-dev) {
+			flag=1;
+		}
+	}
+	if(dev>=0xB5000000 && dev<=0xB5000200) {
+		if(len<=0xB5000200-dev) {
+			flag=1;
+		}
+	}
+	if(flag==0) return -E_INVAL;
+	bcopy(dev, va, len);
+	return 0;
         // Your code here
 }
