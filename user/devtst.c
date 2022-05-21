@@ -22,6 +22,7 @@ void umain()
 	writef("end of devtst\n");
 	
 	writef("IDE test\n");
+	//writef("%d\n",syscall_read_dev(&c, 0x0fffffff,1));
 	if(syscall_read_dev(&c, 0x0fffffff, 1) != -3)
 		user_panic("failed dev address test");
 	if(syscall_read_dev(&c, 0x10000020, 1) != -3)

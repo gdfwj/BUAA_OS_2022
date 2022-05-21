@@ -471,7 +471,7 @@ int sys_write_dev(int sysno, u_int va, u_int dev, u_int len)
 			flag=1;
 		}
 	}
-	if(dev>=0xB300000 && dev<=0xB3004200) {
+	if(dev>=0xB3000000 && dev<=0xB3004200) {
 		if(len<=0xB3004200-dev) {
 			flag=1;
 		}
@@ -507,13 +507,15 @@ int sys_write_dev(int sysno, u_int va, u_int dev, u_int len)
 int sys_read_dev(int sysno, u_int va, u_int dev, u_int len)
 {
 	int flag=0;
+	//printf("dev:%x",dev);
 	dev = dev+0xa0000000;
+	//printf("dev:%x\n",dev);
 	if(dev>=0xB0000000 && dev<=0xB0000020) {
 		if(len<=0xB0000020-dev) {
 			flag=1;
 		}
 	}
-	if(dev>=0xB300000 && dev<=0xB3004200) {
+	if(dev>=0xB3000000 && dev<=0xB3004200) {
 		if(len<=0xB3004200-dev) {
 			flag=1;
 		}
