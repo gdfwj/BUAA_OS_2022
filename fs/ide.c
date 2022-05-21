@@ -25,7 +25,7 @@
 void
 ide_read(u_int diskno, u_int secno, void *dst, u_int nsecs)
 {
-	// 0x200: the size of a sector: 512 bytes.
+	// 0x200: the size of a sector: 512 bytes./
 	int offset_begin = secno * 0x200;
 	int offset_end = offset_begin + nsecs * 0x200;
 	int offset = 0;
