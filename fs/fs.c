@@ -380,9 +380,9 @@ void
 fs_init(void)
 {
 	read_super();
-	writef("read_super ok\n");
+	//writef("read_super ok\n");
 	check_write_block();
-	writef("check_write_block ok\m");
+	//writef("check_write_block ok\m");
 	read_bitmap();
 }
 
