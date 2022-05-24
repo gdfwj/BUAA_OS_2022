@@ -197,8 +197,8 @@ read(int fdnum, void *buf, u_int n)
 		return r;
 	}
 	// Step 2: Check open mode.
-	if ((fd->fd_omode & O_ACCMODE) == O_RDONLY) {
-		writef("[%08x] write %d -- bad mode\n", env->env_id, fdnum);
+	if ((fd->fd_omode & O_ACCMODE) == O_WRONLY) {
+		writef("[%08x] read %d -- bad mode\n", env->env_id, fdnum);
 		return -E_INVAL;
 	}
 	// Step 3: Read starting from seek position.
