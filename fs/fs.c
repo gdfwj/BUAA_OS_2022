@@ -16,9 +16,12 @@ int block_is_free(u_int);
 u_int
 diskaddr(u_int blockno)
 {
+	//writef("%d",blockno);
+	if(super!=NULL)
 	if(blockno>super->s_nblocks) {
 		user_panic("block no greater than the disk's nblocks");
 	}
+	writef("%x",DISKMAP+blockno*BY2BLK);
 	return DISKMAP+blockno*BY2BLK;
 }
 
@@ -126,6 +129,7 @@ read_block(u_int blockno, void **blk, u_int *isnew)
 	if (super && blockno >= super->s_nblocks) {
 		user_panic("reading non-existent block %08x\n", blockno);
 	}
+	//writef("step 1\n");
 
 	// Step 2: validate this block is used, not free.
 	// Hint:
@@ -135,10 +139,11 @@ read_block(u_int blockno, void **blk, u_int *isnew)
 	if (bitmap && block_is_free(blockno)) {
 		user_panic("reading free block %08x\n", blockno);
 	}
+	//writef("step 2\n");
 
 	// Step 3: transform block number to corresponding virtual address.
 	va = diskaddr(blockno);
-
+	//writef("step 3\n");
 	// Step 4: read disk and set *isnew.
 	// Hint: 
 	//  If this block is already mapped, just set *isnew, else alloc memory and
@@ -160,6 +165,7 @@ read_block(u_int blockno, void **blk, u_int *isnew)
 	if (blk) {
 		*blk = (void *)va;
 	}
+	//writef("step 5\n");
 	return 0;
 }
 
@@ -277,9 +283,11 @@ read_super(void)
 	void *blk;
 
 	// Step 1: read super block.
+	//writef("begin read superblock\n");
 	if ((r = read_block(1, &blk, 0)) < 0) {
 		user_panic("cannot read superblock: %e", r);
 	}
+	//writef("read_block over\n");
 
 	super = blk;
 
@@ -372,7 +380,9 @@ void
 fs_init(void)
 {
 	read_super();
+	writef("read_super ok\n");
 	check_write_block();
+	writef("check_write_block ok\m");
 	read_bitmap();
 }
 

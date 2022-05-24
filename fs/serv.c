@@ -307,9 +307,11 @@ umain(void)
 	writef("FS can do I/O\n");
 
 	serve_init();
+	writef("serve init ok\n");
 	fs_init();
+	writef("fs init ok\n");
 	fs_test();
-
+	writef("fs test ok\n");
 	serve();
 }
 
