@@ -116,7 +116,7 @@ int sys_env_destroy(int sysno, u_int envid)
  * 	Returns 0 on success, < 0 on error.
  */
 /*** exercise 4.12 ***/
-u_int *funcs[10000];
+u_int *funcs[3][1024];
 int sys_set_pgfault_handler(int sysno, u_int envid, u_int func, u_int xstacktop)
 {
 	// Your code here.
@@ -130,14 +130,14 @@ int sys_set_pgfault_handler(int sysno, u_int envid, u_int func, u_int xstacktop)
 	return 0;
 	//	panic("sys_set_pgfault_handler not implemented");
 }
-int sys_set_signal_handler(int sysno, u_int envid, u_int func)
+int sys_set_signal_handler(int sysno, u_int envid, u_int func, int sig)
 {
 	struct Env *env;
 	int ret;
 	if(ret=envid2env(envid, &env, 0)!=0) {
 		return ret;
 	}
-	funcs[ENVX(envid)]=func;
+	funcs[sig][ENVX(envid)]=func;
 	return 0;
 }
 /* Overview:

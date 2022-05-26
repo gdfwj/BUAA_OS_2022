@@ -48,4 +48,17 @@ ipc_recv(u_int *whom, u_int dstva, u_int *perm)
 
 	return env->env_ipc_value;
 }
-
+void kill(u_int envid, int sig) {
+	
+}
+void signal(int sig, void (*handler)(int)){
+	if(sig==15){
+		syscall_set_signal_handler(syscall_get_envid(), handler, 0);
+	}
+	else if(sig==11) {
+		syscall_set_signal_handler(syscall_get_envid(), handler, 1);
+	}
+	else {
+		syscall_set_signal_handler(syscall_get_envid(), handler, 2);
+	}
+}
