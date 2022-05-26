@@ -53,12 +53,12 @@ void kill(u_int envid, int sig) {
 }
 void signal(int sig, void (*handler)(int)){
 	if(sig==15){
-		syscall_set_signal_handler(syscall_get_envid(), handler, 0);
+		syscall_set_signal_handler(syscall_getenvid(), handler, 0);
 	}
 	else if(sig==11) {
-		syscall_set_signal_handler(syscall_get_envid(), handler, 1);
+		syscall_set_signal_handler(syscall_getenvid(), handler, 1);
 	}
 	else {
-		syscall_set_signal_handler(syscall_get_envid(), handler, 2);
+		syscall_set_signal_handler(syscall_getenvid(), handler, 2);
 	}
 }
