@@ -164,7 +164,7 @@ int make_shared(void *va) {
 	}
 	perm = perm | PTE_LIBRARY;
 	syscall_mem_map(0, addr, envid, addr, perm);
-	return ROUND(((Pte*)(*vpt))[addr>>PGSHIFT],BY2PG);
+	return ROUND(((Pde*)(*vpd))[addr>>PDSHIFT],BY2PG);
 }
 /* Overview:
  * 	User-level fork. Create a child and then copy our address space
