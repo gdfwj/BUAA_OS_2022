@@ -146,7 +146,8 @@ duppage(u_int envid, u_int pn)
 }
 int make_shared(void *va) {
 	int ret;
-	u_int pn = VPN((u_int)va);
+	//va = ROUND(va, BY2PG);
+	u_int pn = VPN(va);
 	u_int addr = pn<<PGSHIFT;
 	u_int envid = syscall_getenvid();
 	if(addr>=UTOP) return -1;
