@@ -162,6 +162,9 @@ int make_shared(void *va) {
 	if(perm & PTE_R ==0) {
 		return -1;
 	}
+	if(perm & PTE_LIBRARY) {
+		return ROUND(((Pde*)(*vpd))[addr>>PDSHIFT],BY2PG);
+	}
 	perm = perm | PTE_LIBRARY;
 	syscall_mem_map(0, addr, envid, addr, perm);
 	return ROUND(((Pde*)(*vpd))[addr>>PDSHIFT],BY2PG);
