@@ -146,6 +146,7 @@ duppage(u_int envid, u_int pn)
 }
 int make_shared(void *va) {
 	int ret;
+	if(va>=UTOP) return -1;
 	//va = ROUND(va, BY2PG);
 	u_int pn = VPN(va);
 	u_int addr = pn<<PGSHIFT;
@@ -154,12 +155,12 @@ int make_shared(void *va) {
 	if(!((((Pde*)(*vpd))[addr>>PDSHIFT]&PTE_V) &&
              (((Pte*)(*vpt))[addr>>PGSHIFT]&PTE_V))) {
 		ret = syscall_mem_alloc(envid, addr, PTE_V | PTE_R);
-		if(ret<0) {
+		if(ret!=0) {
 			return -1;
 		}
 	}
 	u_int perm = (*vpt)[pn] & 0xfff;
-	if(perm & PTE_R ==0) {
+	if(!(perm & PTE_R)) {
 		return -1;
 	}
 	if(perm & PTE_LIBRARY) {
