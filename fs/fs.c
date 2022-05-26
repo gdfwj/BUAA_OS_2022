@@ -22,7 +22,7 @@ diskaddr(u_int blockno)
 		user_panic("block no greater than the disk's nblocks");
 	}
 	//writef("%x",DISKMAP+blockno*BY2BLK);
-	return DISKMAP+blockno*BY2BLK*2;
+	return DISKMAP+blockno*BY2BLK;
 }
 
 // Overview:
