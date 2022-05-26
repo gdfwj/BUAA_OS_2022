@@ -87,3 +87,9 @@ syscall_cgetc()
 {
 	return msyscall(SYS_cgetc, 0, 0, 0, 0, 0);
 }
+
+int
+syscall_set_signal_handler(u_int envid, void (*func)(void))
+{
+	return msyscall(SYS_set_pgfault_handler, envid, (int)func, 0, 0, 0);
+}

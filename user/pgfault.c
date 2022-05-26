@@ -6,7 +6,8 @@
 
 extern void (*__pgfault_handler)(u_int);
 extern void __asm_pgfault_handler(void);
-
+extern void (*__signal_handler)(u_int);
+extern void __asm_signal_handler(void);
 
 //
 // Set the page fault handler function.
@@ -34,4 +35,24 @@ set_pgfault_handler(void (*fn)(u_int va))
 	// Save handler pointer for assembly to call.
 	__pgfault_handler = fn;
 }
+void
+set_signal_handler(void (*fn)(u_int va))
+{
+	if (__signal_handler == 0) {
+		// Your code here:
+		// map one page of exception stack with top at UXSTACKTOP
+		// register assembly handler and stack with operating system
+		if (syscall_mem_alloc(0, UXSTACKTOP - 2*BY2PG, PTE_V | PTE_R) < 0 ||
+			syscall_set_signal_handler(0, __asm_signal_handler, UXSTACKTOP) < 0) {
+			writef("cannot set pgfault handler\n");
+			return;
+		}
+
+		//		panic("set_pgfault_handler not implemented");
+	}
+
+	// Save handler pointer for assembly to call.
+	__pgfault_handler = fn;
+}
+
 
