@@ -145,9 +145,12 @@ int raid4_valid(u_int diskno) {
 int raid4_write(u_int blockno, void *src) {
 	int invalid[6]={0};
 	int invalidcount=0;
+	u_int j;
 	u_int offset=0;
 	u_int i;
-	
+	char *srcc = src;
+	char checksum[1000];
+	user_bzero(checksum, 0x200);
 	for(i=1;i<=5;i++) {
 		if(raid4_valid(i)==0) {
 			invalid[i]=1;
@@ -158,14 +161,23 @@ int raid4_write(u_int blockno, void *src) {
 		if(invalid[i]==0) {
 			ide_write(i, blockno*2, src+offset, 1);
 		}
+			for(j=0;j<0x200;j++) {
+				checksum[j] = checksum[j] ^ srcc[j+offset];
+			}
 		offset+=0x200;
 	}
+	ide_write(5, blockno*2, checksum, 1);
+	user_bzero(checksum, 0x200);
 	for(i=1;i<=4;i++) {
 		if(invalid[i]==0) {
 			ide_write(i, blockno*2+1, src+offset, 1);
 		}
+			for(j=0;j<0x200;j++) {
+				checksum[j] = checksum[j] ^ srcc[j+offset];
+			}
 		offset+=0x200;
 	}
+	ide_write(5, blockno*2+1, checksum, 1);
 	return invalidcount;
 }
 int raid4_read(u_int blockno, void *src) {
