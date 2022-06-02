@@ -181,5 +181,97 @@ int raid4_write(u_int blockno, void *src) {
 	return invalidcount;
 }
 int raid4_read(u_int blockno, void *src) {
-	return 0;
+	int invalid[6]={0};
+	int invalidcount=0;
+	u_int j;
+	u_int offset=0;
+	u_int i;
+	int falt=0;
+	int flag=0;
+	char *srcc = src;
+	char checksum[1000]={0};
+	char r5[1000]={0};
+	user_bzero(checksum, 0x200);
+	for(i=1;i<=5;i++) {
+		if(raid4_valid(i)==0) {
+			invalid[i]=1;
+			falt=i;
+			invalidcount++;
+		}
+	}
+	if(invalidcount>1) return invalidcount;
+	else if(invalidcount==0) {
+		for(i=1;i<=4;i++) {
+			ide_read(i, blockno*2, src+offset, 1);
+			for(j=0;j<0x200;j++) {
+				checksum[j] = checksum[j] ^ srcc[j+offset];
+			}
+			offset+=0x200;
+		}
+		ide_read(5, blockno*2, r5, 1);
+		for(j=0;j<0x200;j++) {
+			if(r5[j]!=checksum[j]) {
+				flag=1;
+			}
+		}
+		user_bzero(checksum, 0x200);
+		for(i=1;i<=4;i++) {
+			ide_read(i, blockno*2+1, src+offset, 1);
+			for(j=0;j<0x200;j++) {
+				checksum[j] = checksum[j] ^ srcc[j+offset];
+			}
+			offset+=0x200;
+		}
+		ide_read(5, blockno*2+1, r5, 1);
+		for(j=0;j<0x200;j++) {
+			if(r5[j]!=checksum[j]) {
+				flag=1;
+			}
+		}
+		if(flag==1) return -1;
+		return 0;
+	}
+	else if(falt!=5){
+		for(i=1;i<=4;i++) {
+			if(invalid[i]==0) {
+				ide_read(i, blockno*2, src+offset, 1);
+				for(j=0;j<0x200;j++) {
+					checksum[j] = checksum[j] ^ srcc[j+offset];
+				}
+			}
+			offset+=0x200;
+		}
+		ide_read(5, blockno*2, r5, 1);
+		for(j=0;j<0x200;j++) {
+			checksum[j] ^= r5[j];
+		}
+		user_bcopy(checksum, src+(falt-1)*0x200, 0x200);
+		user_bzero(checksum, 0x200);
+		for(i=1;i<=4;i++) {
+			if(invalid[i]==0) {
+				ide_read(i, blockno*2+1, src+offset, 1);
+				for(j=0;j<0x200;j++) {
+					checksum[j] ^= srcc[j+offset];
+				}
+			}
+			offset+=0x200;
+		}
+		ide_read(5, blockno*2+1, r5, 1);
+		for(j=0;j<0x200;j++) {
+			checksum[j] ^=r5[j];
+		}
+		user_bcopy(checksum, src+(falt-1)*0x200+0x800, 0x200);
+		return 1;
+	} else {
+		for(i=1;i<=4;i++) {
+			ide_read(i, blockno*2, src+offset, 1);
+			offset+=0x200;
+		}
+		for(i=1;i<=4;i++) {
+			ide_read(i, blockno*2+1, src+offset, 1);
+			offset+=0x200;
+		}
+		return 1;
+	}
+	
 }
