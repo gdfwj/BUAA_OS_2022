@@ -147,10 +147,10 @@ void raid0_read(u_int secno, void *dst, u_int nsecs) {
 	 u_int dev = 0x13000000;
 	while( offset_begin + offset <offset_end) {
 		if(secno%2==0) {
-			ide_read(1, secno/2, src+offset, 1);
+			ide_read(1, secno/2, dst+offset, 1);
 		}
 		else {
-			ide_read(2, secno/2, src+offset, 1);
+			ide_read(2, secno/2, dst+offset, 1);
 		}
 		offset+=0x200;
 		secno+=1;
