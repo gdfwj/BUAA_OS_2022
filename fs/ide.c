@@ -168,3 +168,6 @@ int raid4_write(u_int blockno, void *src) {
 	}
 	return invalidcount;
 }
+int raid4_read(u_int blockno, void *src) {
+	return 0;
+}
