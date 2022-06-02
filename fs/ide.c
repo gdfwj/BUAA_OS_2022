@@ -117,3 +117,42 @@ ide_write(u_int diskno, u_int secno, void *src, u_int nsecs)
 		// if error occur, then panic.
 	 }
 }
+int time_read() {
+	int trigger = 1;
+    int time = 0;
+    syscall_write_dev(&trigger, 0x15000000, 4); // trigger device to upd the time
+    syscall_read_dev(&time, 0x15000010, 4); // read the time on device
+    return time;
+}
+void raid0_write(u_int secno, void *src, u_int nsecs) {
+	int offset_begin = secno*0x200;
+	int offset_end = offset_begin + nsecs*0x200;
+	int offset = 0;
+	u_int dev = 0x13000000;
+	while ( offset_begin + offset < offset_end ) {
+		if(secno%2==0) {
+			ide_write(1, secno/2, src+offset, 1);
+		}
+		else {
+			ide_write(2, secno/2, src+offset, 1);
+		}
+		offset+=0x200;
+		secno+=1;
+	}
+}
+void raid0_read(u_int secno, void *dst, u_int nsecs) { 
+	int offset_begin = secno*0x200;
+	 int offset_end = offset_begin + nsecs*0x200;
+	 int offset = 0;
+	 u_int dev = 0x13000000;
+	while( offset_begin + offset <offset_end) {
+		if(secno%2==0) {
+			ide_read(1, secno/2, src+offset, 1);
+		}
+		else {
+			ide_read(2, secno/2, src+offset, 1);
+		}
+		offset+=0x200;
+		secno+=1;
+	}
+}
