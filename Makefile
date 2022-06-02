@@ -50,6 +50,6 @@ debug:
 
 sth:
 	git add --all
-	git commit -m "sth"
+	git commit -m "th"
 
 include include.mk
