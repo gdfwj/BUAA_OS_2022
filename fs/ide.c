@@ -51,7 +51,7 @@ ide_read(u_int diskno, u_int secno, void *dst, u_int nsecs)
         }
 
         if (status==0) {
-            user_panic("IDE_read_error for IDE failed!\n");
+            return -1;
         }
         if (syscall_read_dev((u_int)(dst+offset), dev+0x4000, 0x200)<0) {
             user_panic("IDE_read_error when reading data!\n");
@@ -116,4 +116,55 @@ ide_write(u_int diskno, u_int secno, void *src, u_int nsecs)
 
 		// if error occur, then panic.
 	 }
+}
+int raid4_valid(u_int diskno) {
+	u_int dev = 0x13000000;
+	u_char read_mod = 0;
+	int status;
+	u_int cur_offset = 0;
+		if (syscall_write_dev((u_int)&diskno, dev+0x10, 4)<0) {
+            user_panic("IDE_read_error when select by id!\n");
+        }
+
+        if (syscall_write_dev((u_int)&cur_offset, dev, 4)<0) {
+            user_panic("IDE_read_error when setting offset!\n");
+        }
+
+        if (syscall_write_dev((u_int)&read_mod, dev+0x20, 1)<0) {
+            user_panic("IDE_read_error when setting read_mod!\n");
+        }
+		status = 0;
+        if (syscall_read_dev((u_int)&status, dev+0x30, 1)<0) {
+            user_panic("IDE_read_error when getting IDE status!\n");
+        }
+        if (status==0) {
+            return 0;
+        }
+	return 1;
+}
+int raid4_write(u_int blockno, void *src) {
+	int invalid[6]={0};
+	int invalidcount=0;
+	u_int offset=0;
+	u_int i;
+	
+	for(i=1;i<=5;i++) {
+		if(raid4_valid(i)==0) {
+			invalid[i]=1;
+			invalidcount++;
+		}
+	}
+	for(i=1;i<=4;i++) {
+		if(invalid[i]==0) {
+			ide_write(i, blockno*2, src+offset, 1);
+		}
+		offset+=0x200;
+	}
+	for(i=1;i<=4;i++) {
+		if(invalid[i]==0) {
+			ide_write(i, blockno*2+1, src+offset, 1);
+		}
+		offset+=0x200;
+	}
+	return invalidcount;
 }
