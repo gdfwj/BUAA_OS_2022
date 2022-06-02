@@ -166,7 +166,7 @@ int raid4_write(u_int blockno, void *src) {
 			}
 		offset+=0x200;
 	}
-	ide_write(5, blockno*2, checksum, 1);
+	if(invalid[5]==0) ide_write(5, blockno*2, checksum, 1);
 	user_bzero(checksum, 0x200);
 	for(i=1;i<=4;i++) {
 		if(invalid[i]==0) {
@@ -177,7 +177,7 @@ int raid4_write(u_int blockno, void *src) {
 			}
 		offset+=0x200;
 	}
-	ide_write(5, blockno*2+1, checksum, 1);
+	if(invalid[5]==0) ide_write(5, blockno*2+1, checksum, 1);
 	return invalidcount;
 }
 int raid4_read(u_int blockno, void *src) {
