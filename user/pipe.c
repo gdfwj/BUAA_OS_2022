@@ -87,10 +87,12 @@ _pipeisclosed(struct Fd *fd, struct Pipe *p)
 	int pfd,pfp,runs;
 	
 
-
-
-	user_panic("_pipeisclosed not implemented");
-//	return 0;
+	if(pageref(fd)==pageref(p)) {
+		return 1;
+	}
+	
+	//user_panic("_pipeisclosed not implemented");
+	return 0;
 }
 
 int
@@ -117,14 +119,20 @@ piperead(struct Fd *fd, void *vbuf, u_int n, u_int offset)
 	// some bytes, return what you have instead of yielding.)
 	// If the pipe is empty and closed and you didn't copy any data out, return 0.
 	// Use _pipeisclosed to check whether the pipe is closed.
-	int i;
+	int i=0;
 	struct Pipe *p;
 	char *rbuf;
-	
-
-
-	user_panic("piperead not implemented");
-//	return -E_INVAL;
+	rbuf = (char*) vbuf;
+	p=(struct pipe*)fd2data(fd);
+	if(p->p_rpos>=p->p_wpos && !_pipeisclosed(fd, p)) {
+        syscall_yield();
+    }
+	while ((p->p_rpos<p->p_wpos) && i < n) {
+        rbuf[i++] = p->p_buf[(p->p_rpos++)%BY2PIPE];
+    }
+    return i;
+	//user_panic("piperead not implemented");
+	//return -E_INVAL;
 }
 
 static int
@@ -137,15 +145,24 @@ pipewrite(struct Fd *fd, const void *vbuf, u_int n, u_int offset)
 	// the data, wait for the pipe to empty and then keep copying.
 	// If the pipe is full and closed, return 0.
 	// Use _pipeisclosed to check whether the pipe is closed.
-	int i;
+	int i=0;
 	struct Pipe *p;
 	char *wbuf;
-	
-
+	wbuf = (char*)vbuf;
+	p=(struct pipe*)fd2data(fd);
+	while(i<n) {
+		while(p->p_wpos - p->p_rpos >= BY2PIPE) {
+			if(_pipeisclosed(fd, p)) {
+				return 0;
+			}
+			syscall_yield();
+		}
+		p->p_buf[(p->p_wpos++)%BY2PIPE] = wbuf[i++];
+	}
 //	return -E_INVAL;
 	
 	
-	user_panic("pipewrite not implemented");
+	//user_panic("pipewrite not implemented");
 
 	return n;
 }
