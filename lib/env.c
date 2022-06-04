@@ -71,7 +71,6 @@ u_int mkenvid(struct Env *e) {
     u_int asid = asid_alloc();
     return (asid << (1 + LOG2NENV)) | (1 << LOG2NENV) | idx;
 }
-
 /* Overview:
  *  Convert an envid to an env pointer.
  *  If envid is 0 , set *penv = curenv; otherwise set *penv = envs[ENVX(envid)];
@@ -694,3 +693,9 @@ void load_icode_check() {
     printf("load_icode_check() succeeded!\n");
 }
 
+int elf_load_icode(u_char* binary, u_int size, struct Env *e)
+{
+    int entry_point;
+    int r = load_elf(binary, size, &entry_point, e, load_icode_mapper);
+    return r;
+}
