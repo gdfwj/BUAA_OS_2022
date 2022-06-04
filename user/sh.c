@@ -104,19 +104,47 @@ again:
 				writef("syntax error: < not followed by word\n");
 				exit();
 			}
+			fd = open(t, O_RDONLY);
+            dup(fd, 0);
+            close(fd);
 			// Your code here -- open t for reading,
 			// dup it onto fd 0, and then close the fd you got.
-			user_panic("< redirection not implemented");
+			//user_panic("< redirection not implemented");
 			break;
 		case '>':
 			// Your code here -- open t for writing,
 			// dup it onto fd 1, and then close the fd you got.
-			user_panic("> redirection not implemented");
+			//user_panic("> redirection not implemented");
+			if(gettoken(0, &t) != 'w'){
+				writef("syntax error: > not followed by word\n");
+				exit();
+			}
+			// Your code here -- open t for writing,
+            fd = open(t, O_WRONLY);
+			dup(fd, 1);
+            close(fd);
 			break;
 		case '|':
 			// Your code here.
 			// 	First, allocate a pipe.
+			if(pipe(p) < 0) {
+				user_panic("pipe alloc failed\n");
+			}
 			//	Then fork.
+			r = fork();
+			if(r==0) {
+				dup(p[0], 0);
+				close(p[0]);
+                close(p[1]);
+                goto again;
+			}
+			else {
+				dup(p[1], 1);
+				close(p[1]);
+                close(p[0]);
+                rightpipe = r;
+                goto runit;
+			}
 			//	the child runs the right side of the pipe:
 			//		dup the read end of the pipe onto 0
 			//		close the read end of the pipe
