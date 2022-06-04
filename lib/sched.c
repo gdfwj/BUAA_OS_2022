@@ -75,5 +75,6 @@ void sched_yield(void){
 		while (e == NULL || e->env_status != ENV_RUNNABLE);
 	}
   count--;
+  e->env_runs++;
  env_run(e);
 }
