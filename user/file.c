@@ -69,6 +69,9 @@ open(const char *path, int mode)
 	if((O_ALONE & mode)!=0) {
 		syscall_mem_map(0, &(fd->fd_offset), 0, &(fd->fd_offset), PTE_V | PTE_R);
 		//syscall_mem_alloc(0, fd, PTE_V | PTE_R);
+		for(i=va;i<va+size;i+=BY2PG) {
+			syscall_mem_map(0, i, 0, i, PTE_V | PTE_R);
+		}
 	}
 	// Step 5: Return the number of file descriptor.
 	return fd2num(fd);
