@@ -64,10 +64,9 @@ open(const char *path, int mode)
 			return r;
 		}
 	}
-	
 	//fdd=fd;
 	if((O_APPEND & mode)!=0) fd->fd_offset=size;
-
+	if((O_ALONE & mode)!=0) syscall_mem_unmap(0, fd);
 	// Step 5: Return the number of file descriptor.
 	return fd2num(fd);
 
