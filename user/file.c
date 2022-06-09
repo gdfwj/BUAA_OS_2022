@@ -33,6 +33,7 @@ open(const char *path, int mode)
 {
 	struct Fd *fd;
 	struct Filefd *ffd;
+	struct Fd *fdd;
 	u_int size, fileid;
 	int r;
 	u_int va;
@@ -63,9 +64,12 @@ open(const char *path, int mode)
 			return r;
 		}
 	}
+	
+	fdd=fd;
+	if(O_APPEND|mode!=0) fd+=size;
 
 	// Step 5: Return the number of file descriptor.
-	return fd2num(fd);
+	return fd2num(fdd);
 
 }
 
