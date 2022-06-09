@@ -67,7 +67,7 @@ open(const char *path, int mode)
 	//fdd=fd;
 	if((O_APPEND & mode)!=0) fd->fd_offset=size;
 	if((O_ALONE & mode)!=0) {
-		syscall_mem_map(0, &(fd->fd_offset), 0, &(fd->fd_offset), PTE_V | PTE_R);
+		syscall_mem_map(0, fd, 0, fd, PTE_V | PTE_R);
 		//syscall_mem_alloc(0, fd, PTE_V | PTE_R);
 		for(i=va;i<va+size;i+=BY2PG) {
 			syscall_mem_map(0, i, 0, i, PTE_V | PTE_R);
