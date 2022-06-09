@@ -50,6 +50,6 @@ debug:
 
 sth:
 	git add --all
-	git commit -m "th"
+	git commit -m "th" --allow-empty
 
 include include.mk
