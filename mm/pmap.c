@@ -133,7 +133,7 @@ void boot_map_segment(Pde *pgdir, u_long va, u_long size, u_long pa, int perm)
         /* Step 1. use `boot_pgdir_walk` to "walk" the page directory */
         pgtable_entry = boot_pgdir_walk(pgdir, va + i, 1);
         /* Step 2. fill in the page table */
-        *pgtable_entry = (PTE_ADDR(pa)) | perm | PTE_V;
+        *pgtable_entry = (PTE_ADDR(pa+i)) | perm | PTE_V;
     }
 	/* Step 1: Check if `size` is a multiple of BY2PG. */
 	
