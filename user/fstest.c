@@ -9,7 +9,11 @@ void umain()
     if ((r = fork()) == 0) {
 	    n = read(fdnum, buf, 5);
 	    writef("[child] buffer is \'%s\'\n", buf);
+	    n = read(fdnum, buf, 5);
+	    writef("[child] buffer is \'%s\'\n", buf);
     } else {
+	    n = read(fdnum, buf, 5);
+	    writef("[father] buffer is \'%s\'\n", buf);
 	    n = read(fdnum, buf, 5);
 	    writef("[father] buffer is \'%s\'\n", buf);
     }
