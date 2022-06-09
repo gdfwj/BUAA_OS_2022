@@ -66,7 +66,7 @@ open(const char *path, int mode)
 	}
 	
 	//fdd=fd;
-	if(O_APPEND & mode!=0) fd+=size;
+	if(O_APPEND & mode!=0) fd==(char*)fd+size;
 
 	// Step 5: Return the number of file descriptor.
 	return fd2num(fd);
