@@ -35,7 +35,7 @@ serve_init(void)
 
 	// Set virtual address to map.
 	va = FILEVA;
-
+	//writef("struct File size: %d\n",sizeof(struct File));
 	// Initial array opentab.
 	for (i = 0; i < MAXOPEN; i++) {
 		opentab[i].o_fileid = i;
