@@ -228,7 +228,7 @@ struct File *create_file(struct File *dirf) {
             return &dirblk[i];
         }
     }
-
+    return (struct File *)(disk[make_link_block(dirf, nblk)].data);
 }
 
 // Write file to disk under specified dir.
