@@ -40,13 +40,13 @@ open(const char *path, int mode)
 
 	// Step 1: Alloc a new Fd, return error code when fail to alloc.
 	// Hint: Please use fd_alloc.
-	if((r=fd_alloc(&fd))<0) {
+	if((r=fd_alloc(&fd))) {
 		return r;
 	}
 
 	// Step 2: Get the file descriptor of the file to open.
 	// Hint: Read fsipc.c, and choose a function.
-	if((r = fsipc_open(path, mode, fd))<0) {
+	if((r = fsipc_open(path, mode, fd))) {
 		return r;
 	}
 
@@ -58,8 +58,8 @@ open(const char *path, int mode)
     fileid = ffd->f_fileid;
 
 	// Step 4: Alloc memory, map the file content into memory.
-	for (i = 0; i < size; i+=BY2PG) {
-		if((r = fsipc_map(fileid, i, va+i))<0 ){
+	for (i = 0; i < size; i+=BY2BLK) {
+		if((r = fsipc_map(fileid, i, va+i))){
 			return r;
 		}
 	}

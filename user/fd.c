@@ -207,6 +207,7 @@ read(int fdnum, void *buf, u_int n)
 	if (r > 0) {
 		fd->fd_offset += r;
 	}
+	((char *)buf)[r] = '\0';
 	return r;
 }
 
