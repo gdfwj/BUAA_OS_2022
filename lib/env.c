@@ -100,7 +100,7 @@ int envid2env(u_int envid, struct Env **penv, int checkperm)
 
 
     if (e->env_status == ENV_FREE || e->env_id != envid) {
-        *penv = 0;
+        *penv = NULL;
         return -E_BAD_ENV;
     }
     /* Hints:
