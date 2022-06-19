@@ -88,7 +88,7 @@ ide_write(u_int diskno, u_int secno, void *src, u_int nsecs)
      u_char status = 0;
      u_char write_mod = 1;
 	// DO NOT DELETE WRITEF !!!
-	 writef("diskno: %d\n", diskno);
+	// writef("diskno: %d\n", diskno);
 	 while ( offset_begin + offset < offset_end ) {
 		u_int cur_offset = offset_begin + offset;
         if (syscall_write_dev((u_int)&diskno, dev+0x10, 4)<0) {
