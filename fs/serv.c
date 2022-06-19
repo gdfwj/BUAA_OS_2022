@@ -214,7 +214,7 @@ serve_remove(u_int envid, struct Fsreq_remove *rq)
 	// Call file_remove and ipc_send an approprite value to corresponding env.
 	if ((r = file_remove(path))<0){
         ipc_send(envid, r, 0, 0);
-        return;
+        //return;
     }
     ipc_send(envid, 0, 0, 0);
 }

@@ -56,8 +56,9 @@ open(const char *path, int mode)
 	// Hint: Use fd2data to get the start address.
 	va = fd2data(fd);
     ffd = (struct Filefd*)fd;
+	fileid = ffd->f_fileid;
     size = ffd->f_file.f_size;
-    fileid = ffd->f_fileid;
+    
 
 	// Step 4: Alloc memory, map the file content into memory.
 	for (i = 0; i < size; i+=BY2BLK) {
