@@ -18,7 +18,7 @@ diskaddr(u_int blockno)
 {
 	//writef("%d",blockno);
 	if(super!=NULL)
-	if(blockno>super->s_nblocks) {
+	if(blockno>=super->s_nblocks) {
 		user_panic("block no greater than the disk's nblocks");
 	}
 	//writef("%x",DISKMAP+blockno*BY2BLK);
@@ -100,7 +100,7 @@ unmap_block(u_int blockno)
 		write_block(blockno);
 	}
 	// Step 3: use 'syscall_mem_unmap' to unmap corresponding virtual memory.
-	syscall_mem_unmap(0, blockno);
+	syscall_mem_unmap(0, diskaddr(blockno));
 	// Step 4: validate result of this unmap operation.
 	user_assert(!block_is_mapped(blockno));
 }
@@ -556,7 +556,7 @@ dir_lookup(struct File *dir, char *name, struct File **file)
 	struct File *f;
 
 	// Step 1: Calculate nblock: how many blocks are there in this dir？
-	nblock = dir->f_size/BY2BLK;
+	nblock = ROUND(dir->f_size/BY2BLK);
 	for (i = 0; i < nblock; i++) {
 		// Step 2: Read the i'th block of the dir.
 		// Hint: Use file_get_block.
