@@ -85,6 +85,7 @@ void pthread_yield()
 {
 	static int now = 0;
 	int at = now;
+	writef("begin set\n");
 	while (1)
 	{
 		if (pths[now].pth_status == PTH_RUNNABLE)
@@ -129,7 +130,7 @@ void pthread_yield()
 
 void pthread_exit(void *retval)
 {
-	writef("exit begin\n");
+	//writef("exit begin\n");
 	curpth->pth_status = PTH_FREE;
 	int i;
 	for (i = 0; i < 1024; i++)
@@ -141,7 +142,7 @@ void pthread_exit(void *retval)
 		}
 	}
 	curpth = NULL;
-	writef("exit to yield\n");
+	//writef("exit to yield\n");
 	pthread_yield();
 }
 
