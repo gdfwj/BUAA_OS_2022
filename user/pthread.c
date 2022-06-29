@@ -109,7 +109,7 @@ void pthread_yield()
 		//curpth->pth_tf.pc += 12;
 	}
 	count[curpth->pth_id]++;
-	writef("count: %d, tid: %d", count[curpth->pth_id], curpth->pth_id);
+	writef("tid: %d, count: %d\n", curpth->pth_id, count[curpth->pth_id]);
 	if(count[curpth->pth_id]%2==1) {
 		curpth = &pths[now];
 		writef("pthid: %x, pc: %x\n", curpth->pth_id, curpth->pth_tf.pc);
