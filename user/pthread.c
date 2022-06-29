@@ -105,7 +105,7 @@ void pthread_yield()
 	if (curpth) // store trapframe and stack
 	{
 		syscall_get_trapframe(&(curpth->pth_tf));
-		curpth->pth_tf.pc += 80;
+		curpth->pth_tf.pc += 40;
 	}
 	curpth = &pths[now];
 	writef("pthid: %x, pc: %x\n", curpth->pth_id, curpth->pth_tf.pc);
