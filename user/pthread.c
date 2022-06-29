@@ -8,17 +8,7 @@
 #define PTH_WAIT_ONE_END 3
 #define pthread_t u_int
 
-struct Pth
-{
-	struct Trapframe pth_tf; // Saved registers
-	u_int pth_id;	  // Unique thread identifier
-	u_int pth_status; // Status of the environment
-	u_int pth_waiting;
-	u_int *pth_waiting_data; //receive join data
-	int stack[1024];
-};
 
-LIST_HEAD(Pth_list, Pth);
 struct Pth pths[1024];				   // All pths
 extern struct Pth *curpth = NULL;	   // the current pth
 

@@ -16,8 +16,8 @@ extern struct Env *curenv;
  */
 void sys_putchar(int sysno, int c, int a2, int a3, int a4, int a5)
 {
-	printcharc((char) c);
-	return ;
+	printcharc((char)c);
+	return;
 }
 
 /* Overview:
@@ -37,7 +37,8 @@ void *memcpy(void *destaddr, void const *srcaddr, u_int len)
 	char *dest = destaddr;
 	char const *src = srcaddr;
 
-	while (len-- > 0) {
+	while (len-- > 0)
+	{
 		*dest++ = *src++;
 	}
 
@@ -67,12 +68,12 @@ u_int sys_getenvid(void)
 /*** exercise 4.6 ***/
 void sys_yield(void)
 {
-	//printf("sys_yield begin");
-	bcopy((void*)KERNEL_SP - sizeof(struct Trapframe),
-		  (void*)TIMESTACK - sizeof(struct Trapframe),
+	// printf("sys_yield begin");
+	bcopy((void *)KERNEL_SP - sizeof(struct Trapframe),
+		  (void *)TIMESTACK - sizeof(struct Trapframe),
 		  sizeof(struct Trapframe));
-    sched_yield();
-	//printf("sys_yield finsh");
+	sched_yield();
+	// printf("sys_yield finsh");
 }
 
 /* Overview:
@@ -95,7 +96,8 @@ int sys_env_destroy(int sysno, u_int envid)
 	int r;
 	struct Env *e;
 
-	if ((r = envid2env(envid, &e, 1)) < 0) {
+	if ((r = envid2env(envid, &e, 1)) < 0)
+	{
 		return r;
 	}
 
@@ -121,7 +123,8 @@ int sys_set_pgfault_handler(int sysno, u_int envid, u_int func, u_int xstacktop)
 	// Your code here.
 	struct Env *env;
 	int ret;
-	if(ret=envid2env(envid, &env, 0)!=0) {
+	if (ret = envid2env(envid, &env, 0) != 0)
+	{
 		return ret;
 	}
 	env->env_pgfault_handler = func;
@@ -151,33 +154,39 @@ int sys_set_pgfault_handler(int sysno, u_int envid, u_int func, u_int xstacktop)
 int sys_mem_alloc(int sysno, u_int envid, u_int va, u_int perm)
 {
 	// Your code here.
-	//printf("sys_mem_alloc begin\n");
+	// printf("sys_mem_alloc begin\n");
 	struct Env *env;
 	struct Page *ppage;
 	int ret;
 	ret = 0;
-	if(va>=UTOP) {
+	if (va >= UTOP)
+	{
 		return -E_INVAL;
 	}
-	if(perm & PTE_COW) {
+	if (perm & PTE_COW)
+	{
 		return -E_INVAL;
 	}
-	if(!(perm & PTE_V)) {
+	if (!(perm & PTE_V))
+	{
 		return -E_INVAL;
 	}
-	ret = envid2env(envid,&env,0);
-	if (ret<0) {
+	ret = envid2env(envid, &env, 0);
+	if (ret < 0)
+	{
 		return ret;
 	}
 	ret = page_alloc(&ppage);
-	if (ret<0) {
+	if (ret < 0)
+	{
 		return ret;
 	}
 	ret = page_insert(env->env_pgdir, ppage, va, perm);
-	if(ret<0) {
+	if (ret < 0)
+	{
 		return ret;
 	}
-	//printf("sys_mem_alloc return 0\n");
+	// printf("sys_mem_alloc return 0\n");
 	return 0;
 }
 
@@ -198,7 +207,7 @@ int sys_mem_alloc(int sysno, u_int envid, u_int va, u_int perm)
 int sys_mem_map(int sysno, u_int srcid, u_int srcva, u_int dstid, u_int dstva,
 				u_int perm)
 {
-	//printf("sys_mem_map begin\n");
+	// printf("sys_mem_map begin\n");
 	int ret;
 	u_int round_srcva, round_dstva;
 	struct Env *srcenv;
@@ -211,34 +220,41 @@ int sys_mem_map(int sysno, u_int srcid, u_int srcva, u_int dstid, u_int dstva,
 	round_srcva = ROUNDDOWN(srcva, BY2PG);
 	round_dstva = ROUNDDOWN(dstva, BY2PG);
 
-   // your code here
-	if(!(perm&PTE_V)) {
+	// your code here
+	if (!(perm & PTE_V))
+	{
 		return -E_INVAL;
 	}
-	if(srcva>=UTOP||dstva>=UTOP) {
+	if (srcva >= UTOP || dstva >= UTOP)
+	{
 		return -E_INVAL;
 	}
-	ret=envid2env(srcid,&srcenv,0);
-	if(ret<0) {
+	ret = envid2env(srcid, &srcenv, 0);
+	if (ret < 0)
+	{
 		return ret;
 	}
-	ret=envid2env(dstid,&dstenv,0);
-	if (ret<0) {
+	ret = envid2env(dstid, &dstenv, 0);
+	if (ret < 0)
+	{
 		return ret;
 	}
-	ppage=page_lookup(srcenv->env_pgdir,round_srcva,&ppte);
-	if(ppage==NULL) {
+	ppage = page_lookup(srcenv->env_pgdir, round_srcva, &ppte);
+	if (ppage == NULL)
+	{
 		return -E_INVAL;
 	}
-	if((*ppte&PTE_R==0)&&(perm&PTE_R)) {
+	if ((*ppte & PTE_R == 0) && (perm & PTE_R))
+	{
 		return -E_INVAL;
 	}
-	//ppage=pa2page(PTE_ADDR(*ppte));
+	// ppage=pa2page(PTE_ADDR(*ppte));
 	ret = page_insert(dstenv->env_pgdir, ppage, round_dstva, perm);
-	if(ret<0) {
+	if (ret < 0)
+	{
 		return ret;
 	}
-	//printf("sys_mem_map return 0\n");
+	// printf("sys_mem_map return 0\n");
 	return ret;
 }
 
@@ -255,18 +271,20 @@ int sys_mem_map(int sysno, u_int srcid, u_int srcva, u_int dstid, u_int dstva,
 int sys_mem_unmap(int sysno, u_int envid, u_int va)
 {
 	// Your code here.
-	//printf("sys_mem_unmap begin\n");
+	// printf("sys_mem_unmap begin\n");
 	int ret;
 	struct Env *env;
-	if (va>=UTOP) {
+	if (va >= UTOP)
+	{
 		return -E_INVAL;
 	}
-	ret=envid2env(envid,&env,0);
-	if(ret<0) {
+	ret = envid2env(envid, &env, 0);
+	if (ret < 0)
+	{
 		return ret;
 	}
-	page_remove(env->env_pgdir,va);
-	//printf("sys_mem_unmap return 0\n");
+	page_remove(env->env_pgdir, va);
+	// printf("sys_mem_unmap return 0\n");
 	return ret;
 	//	panic("sys_mem_unmap not implemented");
 }
@@ -289,11 +307,12 @@ int sys_env_alloc(void)
 	// Your code here.
 	int r;
 	struct Env *e;
-	if(r=env_alloc(&e, curenv->env_id)<0) return r;
+	if (r = env_alloc(&e, curenv->env_id) < 0)
+		return r;
 	e->env_status = ENV_NOT_RUNNABLE;
-    bcopy((void *)KERNEL_SP - sizeof(struct Trapframe), &(e->env_tf), sizeof(struct Trapframe));
+	bcopy((void *)KERNEL_SP - sizeof(struct Trapframe), &(e->env_tf), sizeof(struct Trapframe));
 	e->env_tf.pc = e->env_tf.cp0_epc;
-    e->env_tf.regs[2] = 0;
+	e->env_tf.regs[2] = 0;
 	e->env_pri = curenv->env_pri;
 
 	return e->env_id;
@@ -318,16 +337,20 @@ int sys_set_env_status(int sysno, u_int envid, u_int status)
 	// Your code here.
 	struct Env *env;
 	int ret;
-	if(status!=ENV_RUNNABLE && status!=ENV_NOT_RUNNABLE && status!=ENV_FREE) {
+	if (status != ENV_RUNNABLE && status != ENV_NOT_RUNNABLE && status != ENV_FREE)
+	{
 		return -E_INVAL;
 	}
 	ret = envid2env(envid, &env, 0);
-	if(ret<0) return ret;
+	if (ret < 0)
+		return ret;
 	env->env_status = status;
-	if(status==ENV_RUNNABLE) {
+	if (status == ENV_RUNNABLE)
+	{
 		LIST_INSERT_HEAD(&env_sched_list[0], env, env_sched_link);
 	}
-	else if(status==ENV_NOT_RUNNABLE) {
+	else if (status == ENV_NOT_RUNNABLE)
+	{
 		LIST_REMOVE(env, env_sched_link);
 	}
 	return 0;
@@ -383,11 +406,12 @@ void sys_panic(int sysno, char *msg)
 /*** exercise 4.7 ***/
 void sys_ipc_recv(int sysno, u_int dstva)
 {
-	if (dstva>=UTOP) return;
-    curenv->env_ipc_recving = 1;
-    curenv->env_ipc_dstva = dstva;
-    curenv->env_status = ENV_NOT_RUNNABLE;
-    sys_yield();
+	if (dstva >= UTOP)
+		return;
+	curenv->env_ipc_recving = 1;
+	curenv->env_ipc_dstva = dstva;
+	curenv->env_status = ENV_NOT_RUNNABLE;
+	sys_yield();
 }
 
 /* Overview:
@@ -416,40 +440,48 @@ int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva,
 	struct Env *e;
 	struct Page *p;
 	r = envid2env(envid, &e, 0);
-    if (r<0) return r;
-	if(e->env_ipc_recving == 0) return -E_IPC_NOT_RECV;
+	if (r < 0)
+		return r;
+	if (e->env_ipc_recving == 0)
+		return -E_IPC_NOT_RECV;
 	e->env_ipc_recving = 0;
-    e->env_ipc_from = curenv->env_id;
-    e->env_ipc_value = value;
-    e->env_status = ENV_RUNNABLE;
-	if(srcva) {
-        //r = sys_mem_map(sysno,curenv->env_id,srcva,envid,e->env_ipc_dstva,perm);
-        //if (r!=0) {
-        //    return r;
-        //}
+	e->env_ipc_from = curenv->env_id;
+	e->env_ipc_value = value;
+	e->env_status = ENV_RUNNABLE;
+	if (srcva)
+	{
+		// r = sys_mem_map(sysno,curenv->env_id,srcva,envid,e->env_ipc_dstva,perm);
+		// if (r!=0) {
+		//     return r;
+		// }
 		p = page_lookup(curenv->env_pgdir, srcva, NULL);
-		if (p == NULL) {
+		if (p == NULL)
+		{
 			return -E_INVAL;
 		}
 		page_insert(e->env_pgdir, p, e->env_ipc_dstva, perm);
-    }
-	e->env_ipc_perm=perm;
+	}
+	e->env_ipc_perm = perm;
 	return 0;
 }
 
-void sys_get_trapframe(void *tf) {
-	bcopy((void *)KERNEL_SP - sizeof(struct Trapframe), tp, sizeof(Trapframe));
+void sys_get_trapframe(void *tf)
+{
+	bcopy((void *)KERNEL_SP - sizeof(struct Trapframe), tp, 156);
 }
 
-void sys_set_trapframe(void *tf) {
-	bcopy(tf, (void*)KERNEL_SP - sizeof(struct Trapframe), sizeof(Trapframe));
+void sys_set_trapframe(void *tf)
+{
+	bcopy(tf, (void *)KERNEL_SP - sizeof(struct Trapframe), 156);
 }
 
-void sys_change_to_new_thread(void *tf, void *stack) {
-	bcopy(stack, (void*)USTACKTOP - BY2PG, BY2PG);
-	bcopy(tf, (void*)KERNEL_SP - sizeof(struct Trapframe), sizeof(Trapframe));
+void sys_change_to_new_thread(void *tf, void *stack)
+{
+	bcopy(stack, (void *)USTACKTOP - BY2PG, BY2PG);
+	bcopy(tf, (void *)KERNEL_SP - sizeof(struct Trapframe), 156);
 }
 
-void sys_get_stack(void *stack) {
-	bcopy((void*)USTACKTOP - BY2PG, stack, BY2PG);
+void sys_get_stack(void *stack)
+{
+	bcopy((void *)USTACKTOP - BY2PG, stack, BY2PG);
 }
