@@ -67,12 +67,12 @@ inline static int syscall_env_alloc(void)
 }
 
 int syscall_set_env_status(u_int envid, u_int status);
-void syscall_set_trapframe(struct Trapframe tf);
+void syscall_set_trapframe(struct Trapframe *tf);
 void syscall_panic(char *msg);
 int syscall_ipc_can_send(u_int envid, u_int value, u_int srcva, u_int perm);
 void syscall_ipc_recv(u_int dstva);
 int syscall_cgetc();
-struct Trapframe syscall_get_trapframe();
+void syscall_get_trapframe(struct Trapframe *tf);
 void syscall_get_stack(void *stack);
 void syscall_change_to_new_thread(void *tf, void *stack);
 
