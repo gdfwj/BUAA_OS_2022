@@ -97,15 +97,16 @@ void pthread_yield()
 		}
 	}
 	now++;
-	writef("begin syscall\n");
-	writef("stack place: %x\n", &(curpth->pth_tf));
+	//writef("begin syscall\n");
+	//writef("stack place: %x\n", &(curpth->pth_tf));
 	if (curpth) // store trapframe and stack
 	{
 		syscall_get_trapframe(&(curpth->pth_tf));
 	}
-	writef("syscall_get ok\n");
+	//writef("syscall_get ok\n");
 	curpth->pth_tf.pc += 28;
 	curpth = &pths[now];
+	writef("begin set\n");
 	syscall_set_trapframe(&(curpth->pth_tf)); // return to new thread
 	user_panic("pthread_yield reach end\n");
 	writef("back ok\n");
@@ -142,7 +143,7 @@ void pthread_join(u_int thread, void **retval)
 {
 	curpth->pth_status = PTH_WAIT_ONE_END;
 	curpth->pth_waiting = thread;
-	writef("begin yield\n");
+	//writef("begin yield\n");
 	pthread_yield();
 	*retval = curpth->pth_waiting_data;
 }
