@@ -99,7 +99,6 @@ void pthread_yield()
 			user_panic("no runnable thread\n");
 		}
 	}
-	now++;
 	//writef("begin syscall\n");
 	//writef("stack place: %x\n", &(curpth->pth_tf));
 	if (curpth) // store trapframe and stack
@@ -109,6 +108,7 @@ void pthread_yield()
 	//writef("syscall_get ok\n");
 	curpth->pth_tf.pc += 28;
 	curpth = &pths[now];
+	now++;
 	writef("begin set\n");
 	writef("pthid: %x, pc: %x\n", curpth->pth_id, curpth->pth_tf.pc);
 	syscall_set_trapframe(&(curpth->pth_tf)); // return to new thread
