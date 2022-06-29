@@ -108,15 +108,15 @@ void pthread_yield()
 		syscall_get_trapframe(&(curpth->pth_tf));
 		//curpth->pth_tf.pc += 12;
 	}
-	count[curpth->pth_id]++;
-	writef("tid: %d, count: %d\n", curpth->pth_id, count[curpth->pth_id]);
-	if(count[curpth->pth_id]%2==1) {
+	//count[curpth->pth_id]++;
+	//writef("tid: %d, count: %d\n", curpth->pth_id, count[curpth->pth_id]);
+	//if(count[curpth->pth_id]%2==1) {
 		curpth = &pths[now];
 		writef("pthid: %x, pc: %x\n", curpth->pth_id, curpth->pth_tf.pc);
 		now++;
 		syscall_set_trapframe(&(curpth->pth_tf)); // return to new thread
-		user_panic("pthread_yield reach end, tid: %d\n", curpth->pth_id);
-	}
+		//user_panic("pthread_yield reach end, tid: %d\n", curpth->pth_id);
+	//}
 	else writef("back ok\n");
 }
 
