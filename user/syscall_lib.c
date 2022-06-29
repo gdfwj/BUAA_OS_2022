@@ -58,11 +58,11 @@ syscall_set_env_status(u_int envid, u_int status)
 	return msyscall(SYS_set_env_status, envid, status, 0, 0, 0);
 }
 
-int
-syscall_set_trapframe(u_int envid, struct Trapframe *tf)
-{
-	return msyscall(SYS_set_trapframe, envid, (int)tf, 0, 0, 0);
-}
+// int
+// syscall_set_trapframe(u_int envid, struct Trapframe *tf)
+// {
+// 	return msyscall(SYS_set_trapframe, envid, (int)tf, 0, 0, 0);
+// }
 
 void
 syscall_panic(char *msg)
@@ -86,4 +86,24 @@ int
 syscall_cgetc()
 {
 	return msyscall(SYS_cgetc, 0, 0, 0, 0, 0);
+}
+
+void
+syscall_get_trapframe(void *tf)
+{
+	msyscall(SYS_get_trapframe, tf, 0, 0, 0, 0);
+}
+
+void syscall_set_trapframe(void *tf)
+{
+	msyscall(SYS_set_trapframe, tf, 0, 0, 0, 0);
+}
+
+void syscall_change_to_new_thread(void *tf, void *stack){
+	msyscall(SYS_change_to_new_thread, tf, stack, 0, 0, 0);
+}
+
+void syscall_get_stack(void *stack)
+{
+	msyscall(SYS_get_stack, tf, 0, 0, 0 ,0);
 }

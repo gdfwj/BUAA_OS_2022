@@ -60,11 +60,23 @@ inline static int syscall_env_alloc(void)
 }
 
 int syscall_set_env_status(u_int envid, u_int status);
-int syscall_set_trapframe(u_int envid, struct Trapframe *tf);
+int syscall_set_trapframe(struct Trapframe *tf);
 void syscall_panic(char *msg);
 int syscall_ipc_can_send(u_int envid, u_int value, u_int srcva, u_int perm);
 void syscall_ipc_recv(u_int dstva);
 int syscall_cgetc();
+int syscall_get_trapframe(void *tp);
+int syscall_get_stack(void *stack);
+int syscall_change_to_new_thread(void *tf, void *stack);
+
+//pthread.c
+int pth_alloc(struct Pth **new);
+void pth_init();
+int pthread_create(pthread_t *id, const void *attr, void *(*start_routine)(void *), void *arg);
+void pthread_exit(void *retval);
+void pthread_join(u_int thread, void **retval);
+int pthread_cancel(pthread_t thread);
+int gettid();
 
 // string.c
 int strlen(const char *s);

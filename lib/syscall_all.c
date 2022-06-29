@@ -346,11 +346,11 @@ int sys_set_env_status(int sysno, u_int envid, u_int status)
  *
  * Note: This hasn't be used now?
  */
-int sys_set_trapframe(int sysno, u_int envid, struct Trapframe *tf)
-{
+// int sys_set_trapframe(int sysno, u_int envid, struct Trapframe *tf)
+// {
 
-	return 0;
-}
+// 	return 0;
+// }
 
 /* Overview:
  * 	Kernel panic with message `msg`.
@@ -435,4 +435,21 @@ int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva,
     }
 	e->env_ipc_perm=perm;
 	return 0;
+}
+
+void sys_get_trapframe(void *tf) {
+	bcopy((void *)KERNEL_SP - sizeof(struct Trapframe), tp, sizeof(Trapframe));
+}
+
+void sys_set_trapframe(void *tf) {
+	bcopy(tf, (void*)KERNEL_SP - sizeof(struct Trapframe), sizeof(Trapframe));
+}
+
+void sys_change_to_new_thread(void *tf, void *stack) {
+	bcopy(stack, (void*)USTACKTOP - BY2PG, BY2PG);
+	bcopy(tf, (void*)KERNEL_SP - sizeof(struct Trapframe), sizeof(Trapframe));
+}
+
+void sys_get_stack(void *stack) {
+	bcopy((void*)USTACKTOP - BY2PG, stack, BY2PG);
 }

@@ -1,13 +1,22 @@
 #include "lib.h"
 
-void umain() {
-    writef(
-        "Smashing some kernel codes...\n"
-        "If your implementation is correct, you may see some TOO LOW here:\n"
-		//"this is a very big file AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n"
-		//"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n"
-		//"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n"
-    );
-    *(int *) KERNBASE = 0;
-    writef("My mission completed!\n");
+char e[100] = "child is end\n";
+void printtid(char *msg)
+{
+    writef("tis is: %d, msg is %s\n", gettid(), msg);
+    pthread_exit(e);
+}
+
+void umain()
+{
+    u_int ctid;
+    char *meg = "test thread";
+    void *ret;
+    writef("thread test begin\n");
+    pthread_init();
+    writef("pthread init ok\n");
+    pthread_create(&ctid, NULL, printtid, meg);
+    writef("create child %d\n", ctid);
+    pthread_join(ctid, &ret);
+    wirtef("child back meg: %s", (char *)ret);
 }
