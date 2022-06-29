@@ -1,7 +1,7 @@
 #include "lib.h"
 
 char e[100] = "child is end\n";
-void printtid(char *msg)
+void *printtid(char *msg)
 {
     writef("tis is: %d, msg is %s\n", gettid(), msg);
     pthread_exit(e);

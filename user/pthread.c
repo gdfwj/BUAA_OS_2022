@@ -73,6 +73,7 @@ int pthread_create(pthread_t *id, const void *attr, void *(*start_routine)(void 
 	}
 	*id = p->pth_id;
 	user_bzero((void *)&p->pth_tf, sizeof(struct Trapframe));
+	writef("pc: %x", start_routine);
 	p->pth_tf.pc = start_routine;
 	u_int stack = alloc_stack();
 	p->pth_tf.regs[29] = stack;
