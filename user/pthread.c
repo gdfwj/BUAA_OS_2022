@@ -83,6 +83,7 @@ int pthread_create(pthread_t *id, const void *attr, void *(*start_routine)(void 
 
 void pthread_yield()
 {
+	static int count[1024]={0};
 	static int now = 0;
 	int at = now;
 	//writef("begin set\n");
@@ -107,23 +108,15 @@ void pthread_yield()
 		syscall_get_trapframe(&(curpth->pth_tf));
 		//curpth->pth_tf.pc += 12;
 	}
-	curpth = &pths[now];
-	writef("pthid: %x, pc: %x\n", curpth->pth_id, curpth->pth_tf.pc);
-	now++;
-	syscall_set_trapframe(&(curpth->pth_tf)); // return to new thread
-	user_panic("pthread_yield reach end\n");
-	writef("back ok\n");
-	writef("back ok\n");
-	writef("back ok\n");
-	writef("back ok\n");
-	writef("back ok\n");
-	writef("back ok\n");
-	writef("back ok\n");
-	writef("back ok\n");
-	writef("back ok\n");
-	writef("back ok\n");
-	writef("back ok\n");
-	writef("back ok\n");
+	count[curpth->pth_id]++;
+	if(count[curpth->pth_id]%2==1) {
+		curpth = &pths[now];
+		writef("pthid: %x, pc: %x\n", curpth->pth_id, curpth->pth_tf.pc);
+		now++;
+		syscall_set_trapframe(&(curpth->pth_tf)); // return to new thread
+		user_panic("pthread_yield reach end\n");
+	}
+	else writef("back ok\n");
 }
 
 void pthread_exit(void *retval)
@@ -139,7 +132,6 @@ void pthread_exit(void *retval)
 			pths[i].pth_waiting_data = retval;
 		}
 	}
-	curpth = NULL;
 	//writef("exit to yield\n");
 	pthread_yield();
 }
