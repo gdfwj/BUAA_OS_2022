@@ -85,7 +85,7 @@ void pthread_yield()
 {
 	static int now = 0;
 	int at = now;
-	writef("begin set\n");
+	//writef("begin set\n");
 	while (1)
 	{
 		if (pths[now].pth_status == PTH_RUNNABLE)
@@ -100,13 +100,13 @@ void pthread_yield()
 			user_panic("no runnable thread\n");
 		}
 	}
-	writef("begin syscall\n");
+	//writef("begin syscall\n");
 	//writef("stack place: %x\n", &(curpth->pth_tf));
 	if (curpth) // store trapframe and stack
 	{
 		syscall_get_trapframe(&(curpth->pth_tf));
 	}
-	//writef("syscall_get ok\n");
+	writef("syscall_get ok\n");
 	curpth->pth_tf.pc += 80;
 	curpth = &pths[now];
 	now++;
