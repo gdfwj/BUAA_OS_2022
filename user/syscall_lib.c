@@ -105,5 +105,5 @@ void syscall_change_to_new_thread(void *tf, void *stack){
 
 void syscall_get_stack(void *stack)
 {
-	msyscall(SYS_get_stack, tf, 0, 0, 0 ,0);
+	msyscall(SYS_get_stack, stack, 0, 0, 0 ,0);
 }

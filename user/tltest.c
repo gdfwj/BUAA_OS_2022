@@ -13,10 +13,10 @@ void umain()
     char *meg = "test thread";
     void *ret;
     writef("thread test begin\n");
-    pthread_init();
+    pth_init();
     writef("pthread init ok\n");
-    pthread_create(&ctid, NULL, printtid, meg);
+    pthread_create(&ctid, NULL, &printtid, meg);
     writef("create child %d\n", ctid);
     pthread_join(ctid, &ret);
-    wirtef("child back meg: %s", (char *)ret);
+    writef("child back meg: %s", (char *)ret);
 }

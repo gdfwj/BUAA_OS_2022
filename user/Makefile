@@ -13,7 +13,8 @@ USERLIB := printf.o \
 		pgfault.o \
 		syscall_lib.o \
 		ipc.o \
-		string.o
+		string.o \
+		pthread.o
 
 CFLAGS += -nostdlib -static
 

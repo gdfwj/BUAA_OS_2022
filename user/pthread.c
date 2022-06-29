@@ -32,7 +32,7 @@ int pth_alloc(struct Pth **new)
 			return -1;
 	}
 	pths[now].pth_status = PTH_RUNNABLE;
-	*new = pth[now];
+	*new = &pths[now];
 	now++;
 }
 
@@ -40,13 +40,13 @@ void pth_init()
 {
 	struct Pth *p;
 	int i;
-	LIST_INIT(&pth_sched_list);
+	//LIST_INIT(&pth_sched_list);
 	for (i = 0; i < 1024; i++)
 	{ // initialize pths
 		pths[i].pth_id = i;
 		pths[i].pth_status = PTH_FREE;
 	}
-	r = pth_alloc(&p); // alloc main thread
+	int r = pth_alloc(&p); // alloc main thread
 	if (r < 0)
 	{
 		user_panic("can not alloc pth");
@@ -58,13 +58,14 @@ int pthread_create(pthread_t *id, const void *attr, void *(*start_routine)(void 
 {
 	struct Pth *p;
 	int r;
-	r = pth_alloc(p);
+	r = pth_alloc(&p);
+	writef("alloc ok\n");
 	if (r < 0)
 	{
 		user_panic("can not alloc pth\n");
 	}
 	*id = p->pth_id;
-	user_bzero(p->pth_tf, sizeof(struct Trapframe));
+	user_bzero((void*)&p->pth_tf, sizeof(struct Trapframe));
 	p->pth_tf.pc = start_routine;
 	p->pth_tf.regs[29] = USTACKTOP;
 	p->pth_tf.regs[4] = arg;
@@ -88,14 +89,17 @@ void pthread_yield()
 
 	}
 	now++;
+	//writef("begin syscall\n");
 	if (curpth) //store trapframe and stack
 	{
-		syscall_get_trapframe(curpth->pth_tf);
-		syscall_get_stack(curpth->stack);
+		syscall_get_trapframe(&curpth->pth_tf);
+		writef("syscall tf ok\n");
+		syscall_get_stack(&curpth->stack);
 	}
+	writef("syscall_get ok\n");
 	curpth->pth_tf.pc+=28;
-	curpth = pths[now];
-	syscall_change_to_new_thread(curpth->pth_tf, curpth->stack); //return to new thread
+	curpth = &pths[now];
+	syscall_change_to_new_thread(&curpth->pth_tf, &curpth->stack); //return to new thread
 	user_panic("pthread_yield reach end\n");
 	writef("back ok\n");
 	writef("back ok\n");
@@ -127,6 +131,7 @@ void pthread_exit(void *retval) {
 void pthread_join(u_int thread, void **retval) {
 	curpth->pth_status = PTH_WAIT_ONE_END;
 	curpth->pth_waiting = thread;
+	writef("begin yield\n");
 	pthread_yield();
 	*retval = curpth->pth_waiting_data;
 }
