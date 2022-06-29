@@ -57,6 +57,7 @@ void pth_init()
 	{
 		user_panic("can not alloc pth");
 	}
+	p->pth_tf.cp0_status = 0x1000100c;
 	curpth = p;
 }
 
@@ -76,6 +77,7 @@ int pthread_create(pthread_t *id, const void *attr, void *(*start_routine)(void 
 	u_int stack = alloc_stack();
 	p->pth_tf.regs[29] = stack;
 	p->pth_tf.regs[4] = arg;
+	p->pth_tf.cp0_status = 0x1000100c;
 }
 
 void pthread_yield()
