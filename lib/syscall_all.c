@@ -472,7 +472,7 @@ void sys_get_trapframe(int sysno, struct Trapframe *tf)
 
 void sys_set_trapframe(int sysno, struct Trapframe *tf)
 {
-	bcopy(tf, &(curenv->env_tf), sizeof(struct Trapframe));
+	bcopy(tf, &(curenv->env_tf), 128);
 	bcopy(tf, (void *)KERNEL_SP - sizeof(struct Trapframe), 128);
 	((struct Trapframe*)((void *)KERNEL_SP - sizeof(struct Trapframe)))->cp0_epc = tf->pc;
 	//printf("epc: %x\n", ((struct Trapframe*)((void *)KERNEL_SP - sizeof(struct Trapframe)))->cp0_epc);
