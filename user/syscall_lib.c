@@ -106,7 +106,7 @@ syscall_get_trapframe()
 	msyscall(SYS_get_trapframe, 0, 0, 0, 0, 0);
 }
 
-void syscall_set_trapframe(struct trapframe tf)
+void syscall_set_trapframe(struct Trapframe tf)
 {
 	msyscall(SYS_set_trapframe, tf, 0, 0, 0, 0);
 }
