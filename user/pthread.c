@@ -115,7 +115,7 @@ void pthread_yield()
 		writef("pthid: %x, pc: %x\n", curpth->pth_id, curpth->pth_tf.pc);
 		now++;
 		syscall_set_trapframe(&(curpth->pth_tf)); // return to new thread
-		user_panic("pthread_yield reach end\n");
+		user_panic("pthread_yield reach end, tid: %d\n", curpth->pth_id);
 	}
 	else writef("back ok\n");
 }
