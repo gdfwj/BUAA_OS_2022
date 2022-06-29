@@ -3,7 +3,7 @@
 char e[100] = "child is end\n";
 void *printtid(void *msg)
 {
-    writef("tis is: %d, msg is %s\n", gettid(), (char*)msg);
+    writef("tid is: %d, msg is %s\n", gettid(), (char*)msg);
     pthread_exit(e);
 }
 

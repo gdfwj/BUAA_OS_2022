@@ -129,6 +129,7 @@ void pthread_yield()
 
 void pthread_exit(void *retval)
 {
+	writef("exit begin\n");
 	curpth->pth_status = PTH_FREE;
 	int i;
 	for (i = 0; i < 1024; i++)
