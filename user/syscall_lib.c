@@ -100,13 +100,13 @@ syscall_cgetc()
 	return msyscall(SYS_cgetc, 0, 0, 0, 0, 0);
 }
 
-struct Trapframe 
-syscall_get_trapframe()
+void 
+syscall_get_trapframe(struct Trapframe *tf)
 {
-	msyscall(SYS_get_trapframe, 0, 0, 0, 0, 0);
+	return msyscall(SYS_get_trapframe, tf, 0, 0, 0, 0);
 }
 
-void syscall_set_trapframe(struct Trapframe tf)
+void syscall_set_trapframe(struct Trapframe *tf)
 {
 	msyscall(SYS_set_trapframe, tf, 0, 0, 0, 0);
 }

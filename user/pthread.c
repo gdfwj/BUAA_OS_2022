@@ -100,12 +100,12 @@ void pthread_yield()
 	// writef("begin syscall\n");
 	if (curpth) // store trapframe and stack
 	{
-		syscall_get_trapframe(curpth->pth_tf);
+		syscall_get_trapframe(&(curpth->pth_tf));
 	}
 	writef("syscall_get ok\n");
 	curpth->pth_tf.pc += 28;
 	curpth = &pths[now];
-	syscall_set_trapframe(curpth->pth_tf); // return to new thread
+	syscall_set_trapframe(&(curpth->pth_tf)); // return to new thread
 	user_panic("pthread_yield reach end\n");
 	writef("back ok\n");
 	writef("back ok\n");
