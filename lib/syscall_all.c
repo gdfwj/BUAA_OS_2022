@@ -472,7 +472,7 @@ struct Trapframe sys_get_trapframe()
 	return temp;
 }
 
-void sys_set_trapframe(struct Trapfame tf)
+void sys_set_trapframe(struct Trapframe tf)
 {
 	bcopy(&tf, (void *)KERNEL_SP - sizeof(struct Trapframe), sizeof(struct Trapframe));
 }
