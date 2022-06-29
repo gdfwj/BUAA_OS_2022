@@ -97,7 +97,7 @@ void pthread_yield()
 		}
 	}
 	now++;
-	// writef("begin syscall\n");
+	writef("begin syscall\n");
 	if (curpth) // store trapframe and stack
 	{
 		syscall_get_trapframe(&(curpth->pth_tf));
