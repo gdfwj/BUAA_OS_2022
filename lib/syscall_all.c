@@ -474,7 +474,7 @@ void sys_set_trapframe(int sysno, struct Trapframe *tf)
 {
 	bcopy(tf, &(curenv->env_tf), sizeof(struct Trapframe));
 	bcopy(tf, (void *)KERNEL_SP - sizeof(struct Trapframe), sizeof(struct Trapframe));
-	printf("pc: %x\n",((struct Trapframe)((void *)KERNEL_SP - sizeof(struct Trapframe)))->pc);
+	printf("pc: %x to %x\n",tf->pc, ((struct Trapframe*)((void *)KERNEL_SP - sizeof(struct Trapframe)))->pc);
 }
 
 void sys_change_to_new_thread(int sysno, void *tf, void *stack) //no use
