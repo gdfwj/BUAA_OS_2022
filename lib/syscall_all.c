@@ -465,23 +465,23 @@ int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva,
 	return 0;
 }
 
-void sys_get_trapframe(struct Trapframe *tf)
+void sys_get_trapframe(int sysno, struct Trapframe *tf)
 {
 	bcopy((void *)KERNEL_SP - sizeof(struct Trapframe), tf, sizeof(struct Trapframe));
 }
 
-void sys_set_trapframe(struct Trapframe *tf)
+void sys_set_trapframe(int sysno, struct Trapframe *tf)
 {
 	bcopy(tf, (void *)KERNEL_SP - sizeof(struct Trapframe), sizeof(struct Trapframe));
 }
 
-void sys_change_to_new_thread(void *tf, void *stack) //no use
+void sys_change_to_new_thread(int sysno, void *tf, void *stack) //no use
 {
 	bcopy(stack, (void *)USTACKTOP - BY2PG, BY2PG);
 	bcopy(tf, (void *)KERNEL_SP - 156, 156);
 }
 
-void sys_get_stack(void *stack) //no use
+void sys_get_stack(int sysno, void *stack) //no use
 {
 	bcopy((void *)USTACKTOP - BY2PG, stack, BY2PG);
 }
