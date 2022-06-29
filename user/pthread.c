@@ -15,7 +15,6 @@ static u_int asid_bitmap[2] = {0};
 
 int pth_alloc(struct Pth **new)
 {
-	struct Pth *e;
 	static int now = 0;
 	int at = now;
 	while (1)
@@ -33,6 +32,7 @@ int pth_alloc(struct Pth **new)
 	pths[now].pth_status = PTH_RUNNABLE;
 	*new = &pths[now];
 	now++;
+	return 0;
 }
 
 u_int alloc_stack()
@@ -53,7 +53,7 @@ void pth_init()
 		pths[i].pth_status = PTH_FREE;
 	}
 	int r = pth_alloc(&p); // alloc main thread
-	p->if (r < 0)
+	if (r < 0)
 	{
 		user_panic("can not alloc pth");
 	}
@@ -74,7 +74,7 @@ int pthread_create(pthread_t *id, const void *attr, void *(*start_routine)(void 
 	user_bzero((void *)&p->pth_tf, sizeof(struct Trapframe));
 	p->pth_tf.pc = start_routine;
 	u_int stack = alloc_stack()
-					  p->pth_tf.regs[29] = stack;
+	p->pth_tf.regs[29] = stack;
 	p->pth_tf.regs[4] = arg;
 }
 
