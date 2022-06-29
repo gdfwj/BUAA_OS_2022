@@ -9,7 +9,7 @@
 #define pthread_t u_int
 
 struct Pth pths[1024];			  // All pths
-extern struct Pth *curpth = NULL; // the current pth
+struct Pth *curpth = NULL; // the current pth
 
 static u_int asid_bitmap[2] = {0};
 
@@ -26,8 +26,8 @@ int pth_alloc(struct Pth **new)
 		now++;
 		if (now == 1024)
 			now = 0;
-		if (now = at)
-			return -1;
+		if (now == at)
+			user_panic("no more pths\n");
 	}
 	pths[now].pth_status = PTH_RUNNABLE;
 	*new = &pths[now];
@@ -73,7 +73,7 @@ int pthread_create(pthread_t *id, const void *attr, void *(*start_routine)(void 
 	*id = p->pth_id;
 	user_bzero((void *)&p->pth_tf, sizeof(struct Trapframe));
 	p->pth_tf.pc = start_routine;
-	u_int stack = alloc_stack()
+	u_int stack = alloc_stack();
 	p->pth_tf.regs[29] = stack;
 	p->pth_tf.regs[4] = arg;
 }
