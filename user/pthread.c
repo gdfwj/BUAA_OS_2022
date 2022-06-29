@@ -106,7 +106,7 @@ void pthread_yield()
 		syscall_get_trapframe(&(curpth->pth_tf));
 	}
 	//writef("syscall_get ok\n");
-	curpth->pth_tf.pc += 28;
+	curpth->pth_tf.pc += 80;
 	curpth = &pths[now];
 	now++;
 	writef("begin set\n");
@@ -141,6 +141,7 @@ void pthread_exit(void *retval)
 		}
 	}
 	curpth = NULL;
+	writef("exit to yield\n");
 	pthread_yield();
 }
 
