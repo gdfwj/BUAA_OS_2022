@@ -3,7 +3,19 @@
 #include <mmu.h>
 #include <env.h>
 #include <trap.h>
+struct Trapframe { //lr:need to be modified(reference to linux pt_regs) TODO
+	/* Saved main processor registers. */
+	unsigned long regs[32];
 
+	/* Saved special registers. */
+	unsigned long cp0_status;
+	unsigned long hi;
+	unsigned long lo;
+	unsigned long cp0_badvaddr;
+	unsigned long cp0_cause;
+	unsigned long cp0_epc;
+	unsigned long pc;
+};
 void syscall_putchar(char ch)
 {
 	msyscall(SYS_putchar, (int)ch, 0, 0, 0, 0);
@@ -88,13 +100,13 @@ syscall_cgetc()
 	return msyscall(SYS_cgetc, 0, 0, 0, 0, 0);
 }
 
-void
-syscall_get_trapframe(void *tf)
+struct Trapframe 
+syscall_get_trapframe()
 {
-	msyscall(SYS_get_trapframe, tf, 0, 0, 0, 0);
+	msyscall(SYS_get_trapframe, 0, 0, 0, 0, 0);
 }
 
-void syscall_set_trapframe(void *tf)
+void syscall_set_trapframe(struct trapframe tf)
 {
 	msyscall(SYS_set_trapframe, tf, 0, 0, 0, 0);
 }

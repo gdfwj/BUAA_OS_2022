@@ -7,6 +7,19 @@
 
 extern char *KERNEL_SP;
 extern struct Env *curenv;
+struct Trapframe { //lr:need to be modified(reference to linux pt_regs) TODO
+	/* Saved main processor registers. */
+	unsigned long regs[32];
+
+	/* Saved special registers. */
+	unsigned long cp0_status;
+	unsigned long hi;
+	unsigned long lo;
+	unsigned long cp0_badvaddr;
+	unsigned long cp0_cause;
+	unsigned long cp0_epc;
+	unsigned long pc;
+};
 
 /* Overview:
  * 	This function is used to print a character on screen.
@@ -465,24 +478,25 @@ int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva,
 	return 0;
 }
 
-void sys_get_trapframe(void *tf)
+struct Trapframe sys_get_trapframe()
 {
-	printf("get trapframe\n");
-	bcopy((void *)KERNEL_SP - 156, tf, 156);
+	struct Trapframe temp;
+	bcopy((void *)KERNEL_SP - sizeof(struct Trapframe), &temp, sizeof(struct Trapframe));
+	return temp;
 }
 
-void sys_set_trapframe(void *tf)
+void sys_set_trapframe(struct Trapfame tf)
 {
-	bcopy(tf, (void *)KERNEL_SP - 156, 156);
+	bcopy(&tf, (void *)KERNEL_SP - sizeof(struct Trapframe), sizeof(struct Trapframe));
 }
 
-void sys_change_to_new_thread(void *tf, void *stack)
+void sys_change_to_new_thread(void *tf, void *stack) //no use
 {
 	bcopy(stack, (void *)USTACKTOP - BY2PG, BY2PG);
 	bcopy(tf, (void *)KERNEL_SP - 156, 156);
 }
 
-void sys_get_stack(void *stack)
+void sys_get_stack(void *stack) //no use
 {
 	bcopy((void *)USTACKTOP - BY2PG, stack, BY2PG);
 }

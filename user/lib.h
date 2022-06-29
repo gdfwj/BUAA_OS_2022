@@ -14,6 +14,19 @@ extern void exit();
 
 extern struct Env *env;
 
+struct Trapframe { //lr:need to be modified(reference to linux pt_regs) TODO
+	/* Saved main processor registers. */
+	unsigned long regs[32];
+
+	/* Saved special registers. */
+	unsigned long cp0_status;
+	unsigned long hi;
+	unsigned long lo;
+	unsigned long cp0_badvaddr;
+	unsigned long cp0_cause;
+	unsigned long cp0_epc;
+	unsigned long pc;
+};
 struct Pth
 {
 	struct Trapframe pth_tf; // Saved registers
@@ -21,7 +34,6 @@ struct Pth
 	u_int pth_status;		 // Status of the environment
 	u_int pth_waiting;
 	u_int *pth_waiting_data; // receive join data
-	int stack[1024];
 };
 #define pthread_t u_int
 
@@ -69,12 +81,12 @@ inline static int syscall_env_alloc(void)
 }
 
 int syscall_set_env_status(u_int envid, u_int status);
-void syscall_set_trapframe(void *tf);
+void syscall_set_trapframe(struct Trapframe tf);
 void syscall_panic(char *msg);
 int syscall_ipc_can_send(u_int envid, u_int value, u_int srcva, u_int perm);
 void syscall_ipc_recv(u_int dstva);
 int syscall_cgetc();
-void syscall_get_trapframe(void *tp);
+struct Trapframe syscall_get_trapframe();
 void syscall_get_stack(void *stack);
 void syscall_change_to_new_thread(void *tf, void *stack);
 
