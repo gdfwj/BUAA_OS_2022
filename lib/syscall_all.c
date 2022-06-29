@@ -7,19 +7,6 @@
 
 extern char *KERNEL_SP;
 extern struct Env *curenv;
-struct Trapframe { //lr:need to be modified(reference to linux pt_regs) TODO
-	/* Saved main processor registers. */
-	unsigned long regs[32];
-
-	/* Saved special registers. */
-	unsigned long cp0_status;
-	unsigned long hi;
-	unsigned long lo;
-	unsigned long cp0_badvaddr;
-	unsigned long cp0_cause;
-	unsigned long cp0_epc;
-	unsigned long pc;
-};
 
 /* Overview:
  * 	This function is used to print a character on screen.
