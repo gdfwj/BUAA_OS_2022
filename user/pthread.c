@@ -107,6 +107,7 @@ void pthread_yield()
 	curpth->pth_tf.pc += 28;
 	curpth = &pths[now];
 	writef("begin set\n");
+	writef("tf place: %x\n", &(curpth->pth_tf));
 	syscall_set_trapframe(&(curpth->pth_tf)); // return to new thread
 	user_panic("pthread_yield reach end\n");
 	writef("back ok\n");
