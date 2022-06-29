@@ -468,7 +468,7 @@ int sys_ipc_can_send(int sysno, u_int envid, u_int value, u_int srcva,
 void sys_get_trapframe(int sysno, struct Trapframe *tf)
 {
 	bcopy((void *)KERNEL_SP - sizeof(struct Trapframe), tf, sizeof(struct Trapframe));
-	tf->cp0_epc = tf->pc;
+	tf->pc = tf->cp0_epc;
 }
 
 void sys_set_trapframe(int sysno, struct Trapframe *tf)
