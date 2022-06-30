@@ -91,6 +91,7 @@ void pthread_yield()
 	//writef("begin set\n");
 	while (1)
 	{
+		writef("now: %d\n");
 		if (pths[now].pth_status == PTH_RUNNABLE)
 		{
 			break;
@@ -196,7 +197,7 @@ int sem_destroy(sem_t *sem) {
 
 int sem_wait(sem_t *sem) {
 	int i;
-	writef("sem: %d\n", *sem);
+	//writef("sem: %d\n", *sem);
 	for(i=0;i<1024;i++) {
 		if(sems[i].pointer==sem) break;
 	}
