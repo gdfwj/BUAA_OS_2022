@@ -96,7 +96,7 @@ void pthread_join(u_int thread, void **retval);
 int pthread_cancel(pthread_t thread);
 int gettid();
 int sem_init(sem_t *sem, int pshared, unsigned int value);
-int sem_destroy(&sem_name);
+int sem_destroy(sem_t *sem);
 int sem_wait(sem_t *sem);
 int sem_post(sem_t *sem);
 int sem_getvalue(sem_t *sem, int *sval);
