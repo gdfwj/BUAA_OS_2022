@@ -91,7 +91,7 @@ void pthread_yield()
 	//writef("at: %d\n", at);
 	while (1)
 	{
-		writef("nowt: %d, status: %d\n", nowt, pths[nowt].pth_status);
+		//writef("nowt: %d, status: %d\n", nowt, pths[nowt].pth_status);
 		if (pths[nowt].pth_status == PTH_RUNNABLE)
 		{
 			break;
@@ -252,6 +252,7 @@ int sem_post(sem_t *sem) {
 	}
 	*sem+=1;
 	if(*sem==1) {
+		//writef("")
 		pths[sems[i].queue[sems[i].head]].pth_status = PTH_RUNNABLE;
 		sems[i].head++;
 		*sem-=1;
