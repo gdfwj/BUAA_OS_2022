@@ -207,7 +207,7 @@ int sem_wait(sem_t *sem) {
 	}
 	else {
 		sems[i].queue[sems[i].tail]=gettid();
-		tail++;
+		sems[i].tail++;
 		while(*sem==0) {
 			curpth->pth_status=PTH_NOT_RUNNABLE;
 			pthread_yield();
@@ -250,6 +250,7 @@ int sem_post(sem_t *sem) {
 	*sem+=1;
 	if(*sem==1) {
 		pths[sems[i].queue[sems[i].head]].pth_status = PTH_RUNNABLE;
+		sems[i].head++;
 		*sem-=1;
 	}
 	return 0;
