@@ -202,11 +202,11 @@ int sem_wait(sem_t *sem) {
 	if(sems[i].share==0 && sems[i].envid!=syscall_getenvid()) {
 		user_panic("no permission to P\n");
 	}
+	writef("sem: %d\n", *sem);
 	if((*sem )> 0) {
 		*sem=*sem-1;
 	}
 	else {
-		writef("in else\n");
 		sems[i].queue[sems[i].tail]=gettid();
 		sems[i].tail++;
 		while(*sem==0) {
