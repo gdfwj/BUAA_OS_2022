@@ -253,7 +253,7 @@ int sem_post(sem_t *sem) {
 	}
 	*sem+=1;
 	if(*sem==1 && sems[i].head!=sems[i].tail) {
-		writef("wake %d\n", pths[sems[i].queue[sems[i].head]].pth_id);
+		writef("wake %d\n", sems[i].queue[sems[i].head]);
 		pths[sems[i].queue[sems[i].head]].pth_status = PTH_RUNNABLE;
 		sems[i].head++;
 		*sem-=1;
