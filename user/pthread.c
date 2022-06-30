@@ -85,10 +85,10 @@ int pthread_create(pthread_t *id, const void *attr, void *(*start_routine)(void 
 
 void pthread_yield()
 {
-	static int count[1024]={0};
+	//static int count[1024]={0};
 	static int now = 0;
 	int at = now;
-	//writef("begin set\n");
+	writef("ar: %d\n", at);
 	while (1)
 	{
 		writef("now: %d\n");
