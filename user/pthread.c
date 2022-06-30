@@ -168,7 +168,7 @@ int sem_init(sem_t *sem, int pshared, unsigned int value) {
 
 	int sem_num;
 	for(sem_num=0;sem_num<1024;sem_num++) {
-		if(sems[sem_num].pointer!=NULL) break;
+		if(sems[sem_num].pointer==NULL) break;
 	}
 	if(sem_num==1024) return -1;
 	if(value<0) {
