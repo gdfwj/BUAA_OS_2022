@@ -52,6 +52,7 @@ void pth_init()
 	{ // initialize pths
 		pths[i].pth_id = i;
 		pths[i].pth_status = PTH_FREE;
+		sems[i].pointer=NULL;
 	}
 	int r = pth_alloc(&p); // alloc main thread
 	if (r < 0)
