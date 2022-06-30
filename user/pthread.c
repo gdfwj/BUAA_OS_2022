@@ -211,11 +211,8 @@ int sem_wait(sem_t *sem) {
 	else {
 		sems[i].queue[sems[i].tail]=gettid();
 		sems[i].tail++;
-		while(*sem==0) {
-			curpth->pth_status=PTH_NOT_RUNNABLE;
-			pthread_yield();
-		}
-		*sem-=1;
+		curpth->pth_status=PTH_NOT_RUNNABLE;
+		pthread_yield();
 	}
 	return 0;
 }
