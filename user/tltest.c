@@ -34,6 +34,7 @@ void *count12345() {
 }
 
 void umain() {
+    int r;
     pthread_t c_tid;
     pth_init();
     sem_init(&sem1, 0, 0);
@@ -43,7 +44,8 @@ void umain() {
     pthread_create(&c_tid, NULL, count12345, NULL);
     writef("%d: 1\n", gettid());
     sem_post(&sem1);
-    sem_wait(&sem2);
+    r = sem_wait(&sem2);
+    if(r<0) user_panic("P failed\n");
     writef("%d: 3\n", gettid());
     sem_post(&sem3);
     sem_wait(&sem4);
