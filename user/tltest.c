@@ -22,6 +22,7 @@
 // }
 
 sem_t sem1, sem2, sem3, sem4;
+char *msg = "child exit\n";
 void *count12345() {
     sem_wait(&sem1);
     writef("%d: 2\n", gettid());
@@ -29,7 +30,7 @@ void *count12345() {
     sem_wait(&sem3);
     writef("%d: 4\n", gettid());
     sem_post(&sem4);
-    pthread_exit();
+    pthread_exit(msg);
 }
 
 void umain() {
