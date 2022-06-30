@@ -247,13 +247,13 @@ int sem_post(sem_t *sem) {
 		if(sems[i].pointer==sem) break;
 	}
 	if(i==1024) return -1;
-	writef("%d: post sem%d\n", gettid(), i);
+	writef("%d: post sem%d\n", gettid(), i+1);
 	if(sems[i].share==0 && sems[i].envid!=syscall_getenvid()) {
 		user_panic("no permission to V\n");
 	}
 	*sem+=1;
 	if(*sem==1 && sems[i].head!=sems[i].tail) {
-		//writef("")
+		writef("wake %d\n", pths[sems[i].queue[sems[i].head]].pth_id);
 		pths[sems[i].queue[sems[i].head]].pth_status = PTH_RUNNABLE;
 		sems[i].head++;
 		*sem-=1;
