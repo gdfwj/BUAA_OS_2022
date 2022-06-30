@@ -247,6 +247,7 @@ int sem_post(sem_t *sem) {
 		if(sems[i].pointer==sem) break;
 	}
 	if(i==1024) return -1;
+	writef("%d: post sem%d\n", gettid(), i);
 	if(sems[i].share==0 && sems[i].envid!=syscall_getenvid()) {
 		user_panic("no permission to V\n");
 	}
