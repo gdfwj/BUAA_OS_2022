@@ -206,6 +206,7 @@ int sem_wait(sem_t *sem) {
 		*sem=*sem-1;
 	}
 	else {
+		writef("in else\n");
 		sems[i].queue[sems[i].tail]=gettid();
 		sems[i].tail++;
 		while(*sem==0) {
