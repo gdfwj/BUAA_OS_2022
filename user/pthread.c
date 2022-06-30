@@ -197,7 +197,7 @@ int sem_destroy(sem_t *sem) {
 
 int sem_wait(sem_t *sem) {
 	int i;
-	//writef("sem: %d\n", *sem);
+	writef("in wait\n");
 	for(i=0;i<1024;i++) {
 		if(sems[i].pointer==sem) break;
 	}
