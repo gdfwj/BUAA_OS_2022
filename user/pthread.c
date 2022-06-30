@@ -195,6 +195,7 @@ int sem_destroy(sem_t *sem) {
 
 int sem_wait(sem_t *sem) {
 	int i;
+	writef("sem: %d\n", *sem);
 	for(i=0;i<1024;i++) {
 		if(sems[i].pointer==sem) break;
 	}
@@ -202,7 +203,6 @@ int sem_wait(sem_t *sem) {
 	if(sems[i].share==0 && sems[i].envid!=syscall_getenvid()) {
 		user_panic("no permission to P\n");
 	}
-	writef("sem: %d\n", *sem);
 	if((*sem )> 0) {
 		*sem=*sem-1;
 	}
