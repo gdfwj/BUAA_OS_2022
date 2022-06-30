@@ -171,7 +171,7 @@ int sem_init(sem_t *sem, int pshared, unsigned int value) {
 	}
 	if(sem_num==1024) return -1;
 	if(value<0) {
-		user_panic("error! invalid value\n")
+		user_panic("error! invalid value\n");
 	}
 	*sem = value;
 	sems[sem_num].pointer = sem;
@@ -235,6 +235,7 @@ int sem_trywait(sem_t *sem) {
 		}
 		*sem-=1;
 	}
+	return 0;
 }
 
 int sem_post(sem_t *sem) {
