@@ -91,7 +91,7 @@ void pthread_yield()
 	//writef("at: %d\n", at);
 	while (1)
 	{
-		writef("nowt: %d\n", nowt);
+		writef("nowt: %d, status: %d\n", nowt, pths[nowt].pth_status);
 		if (pths[nowt].pth_status == PTH_RUNNABLE)
 		{
 			break;
