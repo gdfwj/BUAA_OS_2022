@@ -86,20 +86,20 @@ int pthread_create(pthread_t *id, const void *attr, void *(*start_routine)(void 
 void pthread_yield()
 {
 	//static int count[1024]={0};
-	static int now = 0;
-	int at = now;
+	static int nowt = 0;
+	int at = nowt;
 	writef("ar: %d\n", at);
 	while (1)
 	{
 		//writef("now: %d\n");
-		if (pths[now].pth_status == PTH_RUNNABLE)
+		if (pths[nowt].pth_status == PTH_RUNNABLE)
 		{
 			break;
 		}
-		now++;
-		if (now == 1024)
-			now = 0;
-		if (now == at)
+		nowt++;
+		if (nowt == 1024)
+			nowt = 0;
+		if (nowt == at)
 		{
 			user_panic("no runnable thread\n");
 		}
@@ -114,9 +114,9 @@ void pthread_yield()
 	//count[curpth->pth_id]++;
 	//writef("tid: %d, count: %d\n", curpth->pth_id, count[curpth->pth_id]);
 	//if(count[curpth->pth_id]%2==1) {
-		curpth = &pths[now];
+		curpth = &pths[nowt];
 		//writef("pthid: %x, pc: %x\n", curpth->pth_id, curpth->pth_tf.pc);
-		now++;
+		nowt++;
 		syscall_set_trapframe(&(curpth->pth_tf)); // return to new thread
 		//user_panic("pthread_yield reach end, tid: %d\n", curpth->pth_id);
 	//}
