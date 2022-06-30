@@ -12,6 +12,7 @@ struct Pth pths[1024];			  // All pths
 struct Pth *curpth = NULL; // the current pth
 
 static u_int asid_bitmap[2] = {0};
+struct Sem sems[1024];
 
 int pth_alloc(struct Pth **new)
 {
@@ -112,7 +113,7 @@ void pthread_yield()
 	//writef("tid: %d, count: %d\n", curpth->pth_id, count[curpth->pth_id]);
 	//if(count[curpth->pth_id]%2==1) {
 		curpth = &pths[now];
-		writef("pthid: %x, pc: %x\n", curpth->pth_id, curpth->pth_tf.pc);
+		//writef("pthid: %x, pc: %x\n", curpth->pth_id, curpth->pth_tf.pc);
 		now++;
 		syscall_set_trapframe(&(curpth->pth_tf)); // return to new thread
 		//user_panic("pthread_yield reach end, tid: %d\n", curpth->pth_id);
@@ -161,3 +162,108 @@ int gettid()
 {
 	return curpth->pth_id;
 }
+
+int sem_init(sem_t *sem, int pshared, unsigned int value) {
+
+	int sem_num;
+	for(sem_num=0;sem_num<1024;sem_num++) {
+		if(sems[sem_num].pointer!=NULL) break;
+	}
+	if(sem_num==1024) return -1;
+	if(value<0) {
+		user_panic("error! invalid value\n")
+	}
+	*sem = value;
+	sems[sem_num].pointer = sem;
+	sems[sem_num].share = pshared ? 1: 0;
+	sems[sem_num].envid = syscall_getenvid();
+	return 0;
+}
+
+int sem_destroy(sem_t *sem) {
+	int i;
+	for(i=0;i<1024;i++) {
+		if(sems[i].pointer==sem) break;
+	}
+	if(i==1024) return -1;
+	if(sems[i].share==0 && sems[i].envid!=syscall_getenvid()) {
+		user_panic("no permission to destory\n");
+	}
+	sems[i].pointer=NULL;
+	return 0;
+}
+
+int sem_wait(sem_t *sem) {
+	int i;
+	for(i=0;i<1024;i++) {
+		if(sems[i].pointer==sem) break;
+	}
+	if(i==1024) return -1;
+	if(sems[i].share==0 && sems[i].envid!=syscall_getenvid()) {
+		user_panic("no permission to P\n");
+	}
+	if((*sem )> 0) {
+		*sem=*sem-1;
+	}
+	else {
+		sems[i].queue[sems[i].tail]=gettid();
+		tail++;
+		while(*sem==0) {
+			curpth->pth_status=PTH_NOT_RUNNABLE;
+			pthread_yield();
+		}
+		*sem-=1;
+	}
+	return 0;
+}
+
+int sem_trywait(sem_t *sem) {
+	int i;
+	for(i=0;i<1024;i++) {
+		if(sems[i].pointer==sem) break;
+	}
+	if(i==1024) return -1;
+	if(sems[i].share==0 && sems[i].envid!=syscall_getenvid()) {
+		user_panic("no permission to try_wait\n");
+	}
+	if((*sem )> 0) {
+		*sem=*sem-1;
+	}
+	else {
+		while(*sem==0) {
+			pthread_yield();
+		}
+		*sem-=1;
+	}
+}
+
+int sem_post(sem_t *sem) {
+	int i;
+	for(i=0;i<1024;i++) {
+		if(sems[i].pointer==sem) break;
+	}
+	if(i==1024) return -1;
+	if(sems[i].share==0 && sems[i].envid!=syscall_getenvid()) {
+		user_panic("no permission to V\n");
+	}
+	*sem+=1;
+	if(*sem==1) {
+		pths[sems[i].queue[sems[i].head]].pth_status = PTH_RUNNABLE;
+		*sem-=1;
+	}
+	return 0;
+}
+
+int sem_getvalue(sem_t *sem, int *sval) {
+	int i;
+	for(i=0;i<1024;i++) {
+		if(sems[i].pointer==sem) break;
+	}
+	if(i==1024) return -1;
+	if(sems[i].share==0 && sems[i].envid!=syscall_getenvid()) {
+		user_panic("no permission to get\n");
+	}
+	*sval = *sem;
+	return 0;
+}
+

@@ -11,7 +11,7 @@
 extern void umain();
 extern void libmain();
 extern void exit();
-
+#define sem_t u_int
 extern struct Env *env;
 struct Pth
 {
@@ -21,12 +21,23 @@ struct Pth
 	u_int pth_waiting;
 	u_int *pth_waiting_data; // receive join data
 };
+
+struct Sem {
+	sem_t *pointer;
+	u_char share; //0 thread, 1 process
+	u_int envid;
+	u_int queue[1024];
+	int head;
+	int tail;
+};
+
 #define pthread_t u_int
 
 #define USED(x) (void)(x)
 //////////////////////////////////////////////////////printf
 #include <stdarg.h>
 //#define		LP_MAX_BUF	80
+
 
 void user_lp_Print(void (*output)(void *, const char *, int),
 				   void *arg,
@@ -84,6 +95,11 @@ void pthread_exit(void *retval);
 void pthread_join(u_int thread, void **retval);
 int pthread_cancel(pthread_t thread);
 int gettid();
+int sem_init(sem_t *sem, int pshared, unsigned int value);
+int sem_destroy(&sem_name);
+int sem_wait(sem_t *sem);
+int sem_post(sem_t *sem);
+int sem_getvalue(sem_t *sem, int *sval);
 
 // string.c
 int strlen(const char *s);
