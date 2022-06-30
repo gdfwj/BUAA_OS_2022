@@ -37,8 +37,10 @@ void umain() {
     int r;
     pthread_t c_tid;
     pth_init();
-    sem_init(&sem1, 0, 0);
-    sem_init(&sem2, 0, 0);
+    r = sem_init(&sem1, 0, 0);
+    if(r<0) user_panic("init sem1 failed\n");
+    r = sem_init(&sem2, 0, 0);
+    if(r<0) user_panic("init sem2 failed\n");
     sem_init(&sem3, 0, 0);
     sem_init(&sem4, 0, 0);
     pthread_create(&c_tid, NULL, count12345, NULL);
