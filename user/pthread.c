@@ -101,7 +101,7 @@ void pthread_yield()
 			nowt = 0;
 		if (nowt == at)
 		{
-			user_panic("no runnable thread\n");
+			user_panic("%d called yield and no runnable thread\n", gettid());
 		}
 	}
 	//writef("begin syscall\n");
