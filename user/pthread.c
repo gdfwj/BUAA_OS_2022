@@ -197,7 +197,7 @@ int sem_destroy(sem_t *sem) {
 
 int sem_wait(sem_t *sem) {
 	int i;
-	writef("in wait\n");
+	//writef("in wait\n");
 	for(i=0;i<1024;i++) {
 		if(sems[i].pointer==sem) break;
 	}
@@ -251,7 +251,7 @@ int sem_post(sem_t *sem) {
 		user_panic("no permission to V\n");
 	}
 	*sem+=1;
-	if(*sem==1) {
+	if(*sem==1 && sems[i].head!=sems[i].tail) {
 		//writef("")
 		pths[sems[i].queue[sems[i].head]].pth_status = PTH_RUNNABLE;
 		sems[i].head++;
