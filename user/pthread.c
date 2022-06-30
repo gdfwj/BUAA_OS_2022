@@ -88,10 +88,10 @@ void pthread_yield()
 	//static int count[1024]={0};
 	static int nowt = 0;
 	int at = nowt;
-	writef("ar: %d\n", at);
+	//writef("at: %d\n", at);
 	while (1)
 	{
-		//writef("now: %d\n");
+		writef("nowt: %d\n", nowt);
 		if (pths[nowt].pth_status == PTH_RUNNABLE)
 		{
 			break;
