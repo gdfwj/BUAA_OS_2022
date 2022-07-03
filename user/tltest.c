@@ -105,9 +105,9 @@ void umain() {
     if(r<0) user_panic("init sem4 failed\n");
     r = sem_init(&sem5, 0, 0);
     if(r<0) user_panic("init sem5 failed\n");
-    pthread_create(&c_tid, NULL, count1and3, NULL);
+    pthread_create(&c_tid, NULL, count1and3, cmeg1);
     writef("child %d create\n", c_tid);
-    pthread_create(&c_tid, NULL, count2and4, NULL);
+    pthread_create(&c_tid, NULL, count2and4, cmeg2);
     writef("child %d create\n", c_tid);
     while(1){
         writef("thread %d count 0\n", gettid());
