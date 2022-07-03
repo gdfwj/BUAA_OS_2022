@@ -82,7 +82,7 @@ void count2and4(void *msg)
         sem_wait(&sem2);
         writef("thread %d count 2\n", gettid());
         sem_post(&sem3);
-        sem_post(&sem4);
+        sem_wait(&sem4);
         writef("thread %d count 4\n", gettid());
         sem_post(&sem5);
     }
