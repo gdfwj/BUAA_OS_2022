@@ -93,6 +93,7 @@ void umain() {
     pthread_t c_tid;
     char *cmeg1 = "test thread 1";
     char *cmeg2 = "test thread 2";
+    int r;
     pth_init();
     r = sem_init(&sem1, 0, 0);
     if(r<0) user_panic("init sem1 failed\n");
