@@ -1,10 +1,9 @@
 #include "lib.h"
 
-/*
 char e[100] = "child is end\n";
 void *printtid(void *msg)
 {
-    writef("tid is: %d, msg is %s\n", gettid(), (char*)msg);
+    writef("tid is: %d, msg is %s\n", gettid(), (char *)msg);
     pthread_exit(e);
 }
 
@@ -21,7 +20,6 @@ void umain()
     pthread_join(ctid, &ret);
     writef("child back meg: %s", (char *)ret);
 }
-*/
 
 /*
 sem_t sem1, sem2, sem3, sem4;
@@ -58,6 +56,7 @@ void umain() {
 }
 */
 
+/*
 sem_t sem1, sem2, sem3, sem4, sem5;
 char *msg1 = "child 1 exit\n";
 char *msg2 = "child 2 exit\n";
@@ -117,3 +116,4 @@ void umain() {
         writef("finish one count\n");
     }
 }
+*/
