@@ -1,6 +1,6 @@
 #include "lib.h"
 
-
+/*
 char e[100] = "child is end\n";
 void *printtid(void *msg)
 {
@@ -21,9 +21,9 @@ void umain()
     pthread_join(ctid, &ret);
     writef("child back meg: %s", (char *)ret);
 }
+*/
 
 
-/*
 sem_t sem1, sem2, sem3, sem4;
 char *msg = "child exit\n";
 void *count12345() {
@@ -56,7 +56,7 @@ void umain() {
     sem_wait(&sem4);
     writef("%d: 5\n", gettid());
 }
-*/
+
 
 /*
 sem_t sem1, sem2, sem3, sem4, sem5;
