@@ -151,9 +151,16 @@ void umain()
     sem_init(&sem1, 0, 0);
     sem_init(&sem2, 0, 1);
     int i;
-    for (i = 0; i < 1023; i++)
+    for (i = 0; i < 500; i++)
     {
-        pthread_create(&c_tid, NULL, chi, cmeg1);
+        if (i % 2 == 0)
+        {
+            pthread_create(&c_tid, NULL, chi, cmeg1);
+        }
+        else
+        {
+            pthread_create(&c_tid, NULL, chii, cmeg1);
+        }
     }
     pthread_join(c_tid, &ret);
 }
