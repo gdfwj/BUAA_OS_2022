@@ -120,6 +120,7 @@ void umain() {
 }
 */
 
+/*
 sem_t sem1, sem2;
 int count;
 void chi(void *msg)
@@ -164,3 +165,4 @@ void umain()
     }
     pthread_join(c_tid, &ret);
 }
+*/
