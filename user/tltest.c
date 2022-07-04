@@ -1,5 +1,6 @@
 #include "lib.h"
 
+/*
 char e[100] = "child is end\n";
 void *printtid(void *msg)
 {
@@ -20,6 +21,7 @@ void umain()
     pthread_join(ctid, &ret);
     writef("child back meg: %s", (char *)ret);
 }
+*/
 
 /*
 sem_t sem1, sem2, sem3, sem4;
@@ -117,3 +119,41 @@ void umain() {
     }
 }
 */
+
+sem_t sem1, sem2;
+int count;
+void chi(void *msg)
+{
+    writef("tid is: %d, msg is %s\n", gettid(), (char *)msg);
+    while (1)
+    {
+        sem_wait(&sem2);
+        writef("thread %d said 1 and count %d\n", gettid(), count);
+        sem_post(&sem1);
+    }
+}
+void chii(void *msg)
+{
+    writef("tid is: %d, msg is %s\n", gettid(), (char *)msg);
+    while (1)
+    {
+        sem_wait(&sem1);
+        writef("thread %d said 2 and count %d\n", gettid(), count);
+        sem_post(&sem2);
+    }
+}
+void umain()
+{
+    pthread_t c_tid;
+    void *ret;
+    char *cmeg1 = "test thread begin";
+    pth_init();
+    sem_init(&sem1, 0, 0);
+    sem_init(&sem1, 0, 1);
+    int i;
+    for (i = 0; i < 1023; i++)
+    {
+        pthread_create(&c_tid, NULL, chi, cmeg1);
+    }
+    pthread_join(c_tid, &ret);
+}
