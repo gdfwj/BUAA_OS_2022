@@ -1,6 +1,6 @@
 #include "lib.h"
 
-/*
+
 char e[100] = "child is end\n";
 void *printtid(void *msg)
 {
@@ -21,7 +21,7 @@ void umain()
     pthread_join(ctid, &ret);
     writef("child back meg: %s", (char *)ret);
 }
-*/
+
 
 /*
 sem_t sem1, sem2, sem3, sem4;
