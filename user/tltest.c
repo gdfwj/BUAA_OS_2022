@@ -149,7 +149,7 @@ void umain()
     char *cmeg1 = "test thread begin";
     pth_init();
     sem_init(&sem1, 0, 0);
-    sem_init(&sem1, 0, 1);
+    sem_init(&sem2, 0, 1);
     int i;
     for (i = 0; i < 1023; i++)
     {
